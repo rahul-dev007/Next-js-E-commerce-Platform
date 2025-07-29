@@ -40,7 +40,7 @@ export default function AdminDashboardPage() {
   const stats = response?.stats;
   const userRole = session?.user?.role;
   
-  if (error) return <div className="text-center p-8 text-red-500 ...">Error: {error.message}</div>;
+  if (error) return <div className="text-center p-8 text-red-500 bg-red-100 dark:bg-red-900/30 rounded-lg">Error: {error.message}</div>;
 
   return (
     <div className="space-y-8">
@@ -48,12 +48,15 @@ export default function AdminDashboardPage() {
         <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
           Welcome back, {session?.user?.name}!
         </h1>
+        {/* ========================================================== */}
+        {/* ===== ★★★ আসল সমাধানটি এখানে (THIS IS THE REAL FIX) ★★★ ===== */}
+        {/* ========================================================== */}
+        {/* ★★★ "Here's" এর পরিবর্তে "Here is" ব্যবহার করা হয়েছে ★★★ */}
         <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">
           Here is a snapshot of your {userRole === 'superadmin' ? 'site' : 'contributions'}.
         </p>
       </div>
       
-      {/* ★★★ নতুন এবং ইউনিক পরিসংখ্যান কার্ড ★★★ */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {userRole === 'superadmin' && (
           <>
@@ -70,7 +73,6 @@ export default function AdminDashboardPage() {
         )}
       </div>
 
-      {/* ★★★ নতুন এবং ইউনিক চার্ট ★★★ */}
       <div className="mt-8 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
         <div className="flex items-center gap-3 mb-4">
             <TrendingUp className="text-indigo-500" />

@@ -34,13 +34,11 @@ export default function CartPage() {
 
     const handleCheckout = async () => {
         setIsCheckingOut(true);
-
         if (!session) {
             toast.error("Please log in to proceed to checkout.");
             setIsCheckingOut(false);
             return;
         }
-
         try {
             const response = await fetch('/api/checkout_sessions', {
                 method: 'POST',
@@ -50,16 +48,12 @@ export default function CartPage() {
                     customerEmail: session.user.email,
                 }),
             });
-
             const checkoutSession = await response.json();
-
             if (!response.ok) {
                 throw new Error(checkoutSession.message || 'Failed to create checkout session.');
             }
-
             const stripe = await stripePromise;
             const { error } = await stripe.redirectToCheckout({ sessionId: checkoutSession.id });
-
             if (error) {
                 console.error("Stripe checkout error:", error);
                 toast.error(error.message);
@@ -89,7 +83,8 @@ export default function CartPage() {
                     <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-lg shadow-md">
                         <ShoppingCart size={64} className="mx-auto text-gray-400" />
                         <h2 className="mt-6 text-2xl font-semibold text-gray-700 dark:text-gray-300">Your cart is empty</h2>
-                        <p className="mt-2 text-gray-500 dark:text-gray-400">Looks like you haven no added anything to your cart yet.</p>
+                        {/* ★★★ "haven't" এর পরিবর্তে "have not" ব্যবহার করা হয়েছে ★★★ */}
+                        <p className="mt-2 text-gray-500 dark:text-gray-400">Looks like you have not added anything to your cart yet.</p>
                         <Link href="/products" className="mt-6 inline-flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-indigo-700 transition">
                             <ArrowLeft size={20} />
                             Continue Shopping
@@ -140,18 +135,12 @@ export default function CartPage() {
                                     <p>Total</p>
                                     <p>${totalAmount.toFixed(2)}</p>
                                 </div>
-                                
-                                {/* ★★★ Checkout বাটন UI ঠিক করা হয়েছে ★★★ */}
                                 <button 
                                     onClick={handleCheckout} 
                                     disabled={isCheckingOut}
                                     className="w-full mt-6 bg-green-600 text-white py-3 rounded-lg text-lg font-bold hover:bg-green-700 transition flex items-center justify-center disabled:bg-green-400 disabled:cursor-not-allowed"
                                 >
-                                    {isCheckingOut ? (
-                                        <Loader2 className="animate-spin" />
-                                    ) : (
-                                        'Proceed to Checkout'
-                                    )}
+                                    {isCheckingOut ? ( <Loader2 className="animate-spin" /> ) : ( 'Proceed to Checkout' )}
                                 </button>
                             </div>
                         </div>

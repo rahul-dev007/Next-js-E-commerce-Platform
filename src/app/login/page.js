@@ -39,7 +39,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (status === 'authenticated' && session) {
         toast.success("Logged in successfully! Redirecting...");
-        const userRole = session.user?.role;
+        const userRole = session.user?.role?.toLowerCase();
         if (userRole === 'admin' || userRole === 'superadmin') {
             router.push('/admin/dashboard');
         } else {
@@ -47,7 +47,6 @@ export default function LoginPage() {
         }
     }
   }, [status, session, router, callbackUrl]);
-
 
   const {
     register,
@@ -60,18 +59,15 @@ export default function LoginPage() {
   const onSubmit = async (data) => {
     setIsLoading(true);
     setError(null);
-
     try {
       const result = await signIn("credentials", {
         redirect: false,
         email: data.email,
         password: data.password,
       });
-
       if (result.error) {
         throw new Error(result.error);
       }
-      // Successful sign-in will trigger the useEffect hook
     } catch (err) {
       setError("Invalid credentials. Please check your email and password.");
       toast.error("Invalid credentials. Please check your email and password.");
@@ -96,10 +92,9 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
       <div className="w-full max-w-md space-y-6 rounded-2xl bg-white p-8 shadow-2xl dark:bg-gray-800">
         <div className="text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
-            Sign in to your account
-          </h2>
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Sign in to your account</h2>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            {/* ★★★ "Don't" এর পরিবর্তে "Do not" ব্যবহার করা হয়েছে ★★★ */}
             Do not have an account?{" "}
             <Link
               href="/register"
@@ -109,7 +104,6 @@ export default function LoginPage() {
             </Link>
           </p>
         </div>
-
         <div className="grid grid-cols-2 gap-4">
           <button
             onClick={() => handleSocialSignIn("github")}
@@ -124,70 +118,28 @@ export default function LoginPage() {
             <Chrome className="mr-2 h-5 w-5" /> Google
           </button>
         </div>
-
         <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300 dark:border-gray-600" />
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="bg-white px-2 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
-              Or with email
-            </span>
-          </div>
+          <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-300 dark:border-gray-600" /></div>
+          <div className="relative flex justify-center text-sm"><span className="bg-white px-2 text-gray-500 dark:bg-gray-800 dark:text-gray-400">Or with email</span></div>
         </div>
-
         <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
           <div className="relative">
             <Mail className="pointer-events-none absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-gray-400" />
-            <input
-              id="email"
-              type="email"
-              {...register("email")}
-              className="w-full rounded-lg border-gray-300 py-3 pl-12 pr-4 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:ring-indigo-500/50"
-              placeholder="Email address"
-            />
-            {errors.email && (
-              <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>
-            )}
+            <input id="email" type="email" {...register("email")} className="w-full rounded-lg border-gray-300 py-3 pl-12 pr-4 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:ring-indigo-500/50" placeholder="Email address" />
+            {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>}
           </div>
           <div className="relative">
             <Lock className="pointer-events-none absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-gray-400" />
-            <input
-              id="password"
-              type={showPassword ? "text" : "password"}
-              {...register("password")}
-              className="w-full rounded-lg border-gray-300 py-3 pl-12 pr-12 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:ring-indigo-500/50"
-              placeholder="Password"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute top-1/2 right-4 -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-            >
+            <input id="password" type={showPassword ? "text" : "password"} {...register("password")} className="w-full rounded-lg border-gray-300 py-3 pl-12 pr-12 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:ring-indigo-500/50" placeholder="Password" />
+            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute top-1/2 right-4 -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
-             {errors.password && (
-              <p className="mt-1 text-xs text-red-600">{errors.password.message}</p>
-            )}
+            {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password.message}</p>}
           </div>
-          <div className="text-right text-sm">
-            <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
-                Forgot password?
-            </a>
-          </div>
-
-          {error && (
-            <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400">
-              {error}
-            </div>
-          )}
-
+          <div className="text-right text-sm"><a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">Forgot password?</a></div>
+          {error && <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400">{error}</div>}
           <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="flex w-full justify-center rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 py-3 px-4 font-semibold text-white shadow-lg transition-all duration-300 hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-70 dark:focus:ring-offset-gray-800"
-            >
+            <button type="submit" disabled={isLoading} className="flex w-full justify-center rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 py-3 px-4 font-semibold text-white shadow-lg transition-all duration-300 hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-70 dark:focus:ring-offset-gray-800">
               {isLoading && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
               {isLoading ? "Signing In..." : "Sign In"}
             </button>

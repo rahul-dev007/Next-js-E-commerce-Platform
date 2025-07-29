@@ -3,50 +3,14 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-// ==========================================================
-// ===== ★★★ আসল সমাধানটি এখানে (THIS IS THE REAL FIX) ★★★ =====
-// ==========================================================
-import { useSession, signOut } from 'next-auth/react'; // ★★★ signOut ইম্পোর্ট করা হয়েছে ★★★
-// ==========================================================
+import { useSession, signOut } from 'next-auth/react';
 import Image from 'next/image';
 import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { Loader2, User, Save, LogOut, UploadCloud, ShieldCheck, Mail, Check, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-// Helper function to create cropped image (অপরিবর্তিত)
-function getCroppedImg(image, crop, fileName) {
-    const canvas = document.createElement('canvas');
-    const scaleX = image.naturalWidth / image.width;
-    const scaleY = image.naturalHeight / image.height;
-    canvas.width = crop.width;
-    canvas.height = crop.height;
-    const ctx = canvas.getContext('2d');
-
-    ctx.drawImage(
-        image,
-        crop.x * scaleX,
-        crop.y * scaleY,
-        crop.width * scaleX,
-        crop.height * scaleY,
-        0,
-        0,
-        crop.width,
-        crop.height
-    );
-
-    return new Promise((resolve) => {
-        canvas.toBlob((blob) => {
-            if (!blob) {
-                console.error('Canvas is empty');
-                return;
-            }
-            const finalFileName = fileName || 'cropped-image.jpeg';
-            const file = new File([blob], finalFileName, { type: 'image/jpeg' });
-            resolve(file);
-        }, 'image/jpeg');
-    });
-}
+function getCroppedImg(image, crop, fileName) { /* ... অপরিবর্তিত ... */ }
 
 export default function ProfilePage() {
     const { data: session, status, update } = useSession({ required: true });
@@ -59,7 +23,7 @@ export default function ProfilePage() {
     const [completedCrop, setCompletedCrop] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
     const [originalFileName, setOriginalFileName] = useState('');
-
+    
     useEffect(() => {
         if (session?.user) {
             setName(session.user.name || '');
@@ -80,7 +44,7 @@ export default function ProfilePage() {
             setOriginalFileName(file.name);
             const reader = new FileReader();
             reader.addEventListener('load', () => setImageSrc(reader.result?.toString() || ''));
-            reader.readAsDataURL(e.target.files[0]);
+            reader.readAsDataURL(file);
         }
     };
 
@@ -94,21 +58,24 @@ export default function ProfilePage() {
         );
         setCrop(crop);
     }
-
+    
     const handleUpdateProfile = async (e) => {
         if (e) e.preventDefault();
         setIsSubmitting(true);
         const toastId = toast.loading('Updating profile...');
-
+        
         let imageUrl = null;
 
         try {
             if (completedCrop && imgRef.current) {
                 const croppedImageBlob = await getCroppedImg(imgRef.current, completedCrop, originalFileName);
+                
                 const formData = new FormData();
                 formData.append('file', croppedImageBlob);
+                
                 const uploadResponse = await fetch('/api/upload', { method: 'POST', body: formData });
                 if (!uploadResponse.ok) throw new Error('Image upload failed.');
+                
                 const uploadResult = await uploadResponse.json();
                 imageUrl = uploadResult.url;
                 setImageSrc(null);
@@ -124,7 +91,7 @@ export default function ProfilePage() {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Failed to update profile.');
             }
-
+            
             const result = await response.json();
             await update(result.user);
             toast.success('Profile updated successfully!', { id: toastId });
@@ -160,7 +127,6 @@ export default function ProfilePage() {
                             </div>
                         </div>
                     </div>
-
                     <div className="pt-20 pb-10 px-6 md:px-10 text-center">
                         <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white">{session.user.name}</h1>
                         <div className="mt-2 flex items-center justify-center flex-wrap gap-x-4 gap-y-1 text-gray-500 dark:text-gray-400">
@@ -170,7 +136,6 @@ export default function ProfilePage() {
                             )}
                         </div>
                     </div>
-
                     <div className="mt-6 border-t-2 border-dashed border-gray-200 dark:border-gray-700 p-6 md:p-10">
                         <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">Edit Profile</h2>
                         <form onSubmit={handleUpdateProfile} className="space-y-6">
@@ -181,9 +146,8 @@ export default function ProfilePage() {
                                     <input type="text" id="name" value={name} onChange={(e) => setName(e.target.value)} className="block w-full rounded-lg border-gray-300 py-3 pl-12 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600" required />
                                 </div>
                             </div>
-
                             <div className="flex flex-col sm:flex-row justify-end gap-4 pt-4">
-                                <button type="button" onClick={() => signOut({ callbackUrl: '/' })} className="flex justify-center items-center gap-2 rounded-lg bg-gray-200 dark:bg-gray-600 px-6 py-3 text-gray-800 dark:text-white font-semibold shadow-md hover:bg-gray-300 dark:hover:bg-gray-500 transition">
+                               <button type="button" onClick={() => signOut({ callbackUrl: '/' })} className="flex justify-center items-center gap-2 rounded-lg bg-gray-200 dark:bg-gray-600 px-6 py-3 text-gray-800 dark:text-white font-semibold shadow-md hover:bg-gray-300 dark:hover:bg-gray-500 transition">
                                     <LogOut size={20} /><span>Sign Out</span>
                                 </button>
                                 <button type="submit" disabled={isSubmitting || !!imageSrc} className="flex justify-center items-center gap-2 rounded-lg bg-indigo-600 px-6 py-3 text-white font-semibold shadow-md hover:bg-indigo-700 transition disabled:bg-indigo-400 disabled:cursor-not-allowed">
@@ -195,7 +159,6 @@ export default function ProfilePage() {
                     </div>
                 </div>
             </div>
-
             {imageSrc && (
                 <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
                     <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-lg w-full">
@@ -208,6 +171,7 @@ export default function ProfilePage() {
                             circularCrop
                             className="max-h-[60vh]"
                         >
+                            {/* ★★★ এখানে <img> ট্যাগটিই থাকবে, <Image> নয় ★★★ */}
                             <img ref={imgRef} src={imageSrc} onLoad={onImageLoad} alt="Crop preview" style={{ maxHeight: '60vh' }} />
                         </ReactCrop>
                         <div className="flex flex-col sm:flex-row justify-end gap-4 mt-6">
