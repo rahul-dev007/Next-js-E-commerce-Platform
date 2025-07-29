@@ -1,7 +1,10 @@
+// jsconfig.json (এই সঠিক কোডটি পেস্ট করুন)
+
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["src/*"]
     }
   }
 }

@@ -1,14 +1,14 @@
+# Created by https://www.toptal.com/developers/gitignore/api/nextjs,react,node
+# Edit at https://www.toptal.com/developers/gitignore?templates=nextjs,react,node
+
+### Next.js ###
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
 /node_modules
 /.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
+.pnp.js
+.yarn/install-state.gz
 
 # testing
 /coverage
@@ -19,6 +19,10 @@
 
 # production
 /build
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # misc
 .DS_Store
@@ -28,10 +32,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.pnpm-debug.log*
-
-# env files (can opt-in for committing if needed)
-.env*
+pnpm-debug.log*
 
 # vercel
 .vercel
@@ -39,3 +40,30 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Editor directories and files
+.idea
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# My custom ignores
+# আপনি চাইলে এখানে আপনার নিজের কোনো ফাইল বা ফোল্ডার যোগ করতে পারেন
+# যেমন:
+# /screenshots
+
+# ==========================================================
+# ===== ★★★ আসল সমাধানটি এখানে (THIS IS THE REAL FIX) ★★★ =====
+# ==========================================================
+# ★★★ .env* এর পরিবর্তে .env.local ব্যবহার করা হয়েছে ★★★
+# এটি নিশ্চিত করে যে আপনার `.env.example` ফাইলটি (যদি থাকে) ইগনোর হবে না।
+# .env* is too broad and will ignore .env.example
+.env.local
+# ==========================================================

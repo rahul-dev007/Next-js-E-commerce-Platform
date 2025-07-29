@@ -1,103 +1,122 @@
+// src/app/page.js
+
+"use client";
+
+import Link from "next/link";
 import Image from "next/image";
+import { ArrowRight, ShoppingBag, Truck, ShieldCheck, LifeBuoy } from "lucide-react";
 
-export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+// ==========================================================
+// ===== ★★★ আসল সমাধানটি এখানে (THIS IS THE REAL FIX) ★★★ =====
+// ==========================================================
+// ★★★ সঠিক পাথ ব্যবহার করা হয়েছে ★★★
+import { useGetProductsQuery } from "../store/api/productsApi";
+// ==========================================================
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+import ShopProductCard from "../components/ShopProductCard";
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
+
+// Hero Section Component
+function HeroSection() {
+    return (
+        <section className="relative bg-gradient-to-r from-gray-900 to-sky-900 text-white py-20 sm:py-32 overflow-hidden">
+            <div className="container mx-auto px-4 text-center relative z-10">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-tight">
+                    Discover Your Next Favorite Thing
+                </h1>
+                <p className="mt-6 max-w-2xl mx-auto text-lg sm:text-xl text-sky-200">
+                    Explore our curated collection of high-quality products, designed to bring joy and innovation into your life.
+                </p>
+                <div className="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
+                    <Link href="/products" className="inline-flex items-center justify-center gap-2 rounded-full bg-white text-gray-900 px-8 py-4 text-lg font-bold shadow-lg transition-transform hover:scale-105">
+                        <ShoppingBag />
+                        Shop Now
+                    </Link>
+                    <Link href="#featured" className="inline-flex items-center gap-2 text-white font-semibold">
+                        Explore Features <ArrowRight size={20} />
+                    </Link>
+                </div>
+            </div>
+        </section>
+    );
+}
+
+// Featured Products Section Component
+function FeaturedProducts() {
+    const { data, isLoading, error } = useGetProductsQuery({ page: 1, limit: 4 });
+    const products = data?.products;
+
+    if (isLoading) {
+        return (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                {Array.from({ length: 4 }).map((_, i) => <div key={i}><Skeleton height={350} /></div>)}
+            </div>
+        );
+    }
+
+    if (error || !products) return <p className="text-center text-red-500">Could not load featured products.</p>;
+
+    return (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {products.map(product => (
+                <ShopProductCard key={product._id} product={product} />
+            ))}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+    );
+}
+
+// Why Choose Us Section Component
+function WhyChooseUs() {
+    const features = [
+        { icon: Truck, title: "Free Shipping", description: "Enjoy free shipping on all orders above $50." },
+        { icon: ShieldCheck, title: "Secure Payments", description: "Your payments are safe with our encrypted checkout." },
+        { icon: LifeBuoy, title: "24/7 Support", description: "Our team is here to help you around the clock." }
+    ];
+
+    return (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            {features.map(feature => (
+                <div key={feature.title} className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg hover:shadow-indigo-500/10 transition">
+                    <div className="mx-auto h-16 w-16 flex items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/50">
+                        <feature.icon className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
+                    </div>
+                    <h3 className="mt-6 text-xl font-bold text-gray-900 dark:text-white">{feature.title}</h3>
+                    <p className="mt-2 text-gray-600 dark:text-gray-400">{feature.description}</p>
+                </div>
+            ))}
+        </div>
+    );
+}
+
+// মূল হোম পেজ কম্পোনেন্ট
+export default function HomePage() {
+  return (
+    <div className="bg-gray-50 dark:bg-gray-900">
+        <HeroSection />
+
+        <main className="container mx-auto px-4 py-16 sm:py-24 space-y-24">
+            <section id="featured">
+                <div className="text-center mb-12">
+                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">Featured Products</h2>
+                    <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-600 dark:text-gray-400">Check out our handpicked collection of the best products.</p>
+                </div>
+                <FeaturedProducts />
+                <div className="text-center mt-12">
+                    <Link href="/products" className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">
+                        View All Products →
+                    </Link>
+                </div>
+            </section>
+
+            <section>
+                <div className="text-center mb-12">
+                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">Why Shop With Us?</h2>
+                    <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-600 dark:text-gray-400">We are committed to providing you the best shopping experience.</p>
+                </div>
+                <WhyChooseUs />
+            </section>
+        </main>
     </div>
   );
 }
