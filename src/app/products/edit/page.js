@@ -9,7 +9,7 @@ import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
 
 // সঠিক Relative Path ব্যবহার করা হয়েছে
-import { useGetProductByIdQuery, useUpdateProductMutation } from "../../../../store/api/productsApi";
+import { useGetProductByIdQuery, useUpdateProductMutation } from "../../../store/api/productsApi";
 
 const productSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters."),
@@ -22,7 +22,7 @@ const productSchema = z.object({
 export default function EditProductPage() {
   const router = useRouter();
   const { id } = useParams(); // URL থেকে id নিন
-  
+
   const { data: session, status } = useSession({
     required: true,
     onUnauthenticated() {
@@ -42,7 +42,7 @@ export default function EditProductPage() {
   } = useForm({
     resolver: zodResolver(productSchema),
   });
-  
+
   // ডেটা লোড হওয়ার পর ফর্মের ফিল্ডগুলো পূরণ করুন
   useEffect(() => {
     if (productData?.product) {
@@ -57,10 +57,10 @@ export default function EditProductPage() {
       console.error("Failed to update product:", err);
     }
   };
-  
+
   if (isSuccess) {
-      router.push(`/products/${id}`);
-      router.refresh(); // পেজ রিফ্রেশ করে নতুন ডেটা দেখান
+    router.push(`/products/${id}`);
+    router.refresh(); // পেজ রিফ্রেশ করে নতুন ডেটা দেখান
   }
 
   if (status === "loading" || isProductLoading) {
@@ -72,7 +72,7 @@ export default function EditProductPage() {
   }
 
   if (isError) {
-      return <div className="text-center py-10 text-red-500">Failed to load product data.</div>
+    return <div className="text-center py-10 text-red-500">Failed to load product data.</div>
   }
 
   return (
@@ -96,16 +96,16 @@ export default function EditProductPage() {
             {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
           </div>
           <div className="grid grid-cols-2 gap-6">
-             <div>
-                <label>Price ($)</label>
-                <input type="number" step="0.01" {...register("price")} className="mt-1 w-full rounded-lg border-gray-300 shadow-sm" />
-                {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
-             </div>
-             <div>
-                <label>Category</label>
-                <input {...register("category")} className="mt-1 w-full rounded-lg border-gray-300 shadow-sm" />
-                {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category.message}</p>}
-             </div>
+            <div>
+              <label>Price ($)</label>
+              <input type="number" step="0.01" {...register("price")} className="mt-1 w-full rounded-lg border-gray-300 shadow-sm" />
+              {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
+            </div>
+            <div>
+              <label>Category</label>
+              <input {...register("category")} className="mt-1 w-full rounded-lg border-gray-300 shadow-sm" />
+              {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category.message}</p>}
+            </div>
           </div>
           <div>
             <label>Image URL</label>
