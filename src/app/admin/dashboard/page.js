@@ -49,7 +49,7 @@ export default function AdminDashboardPage() {
           Welcome back, {session?.user?.name}!
         </h1>
         <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">
-          Here's a snapshot of your {userRole === 'superadmin' ? 'site' : 'contributions'}.
+          Here is a snapshot of your {userRole === 'superadmin' ? 'site' : 'contributions'}.
         </p>
       </div>
       

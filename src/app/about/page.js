@@ -30,7 +30,7 @@ export default function AboutPage() {
                 <div className="container mx-auto px-4">
                     <h1 className="text-4xl md:text-5xl font-extrabold">About This Project</h1>
                     <p className="mt-4 text-lg text-sky-200 max-w-3xl mx-auto">
-                        This is a comprehensive case study of "MyAuthApp", a production-ready full-stack e-commerce platform built from scratch.
+                        This is a comprehensive case study of MyAuthApp, a production-ready full-stack e-commerce platform built from scratch.
                     </p>
                 </div>
             </header>
