@@ -3,8 +3,6 @@
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import { FlatCompat } from "@eslint/eslintrc";
-import globals from "globals";
-import reactPlugin from "eslint-plugin-react";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -13,30 +11,23 @@ const compat = new FlatCompat({
   baseDirectory: __dirname,
 });
 
-const eslintConfig = [
-  // Next.js-এর বেস কনফিগারেশন
-  ...compat.extends("next/core-web-vitals"),
-  
-  // ==========================================================
-  // ===== ★★★ আসল সমাধানটি এখানে (THIS IS THE REAL FIX) ★★★ =====
-  // ==========================================================
-  {
-    files: ["**/*.js", "**/*.jsx", "**/*.mjs"], // .mjs ফাইলও যোগ করা হলো
-    plugins: {
-      react: reactPlugin,
-    },
-    languageOptions: {
-        globals: {
-            ...globals.browser,
-            ...globals.node,
-        }
-    },
-    rules: {
-      // ★★★ এই লাইনটি "don't" বা "it's" এর মতো শব্দের জন্য এরর দেওয়া বন্ধ করবে ★★★
-      "react/no-unescaped-entities": "off",
-    },
+// ==========================================================
+// ===== ★★★ আসল সমাধানটি এখানে (THIS IS THE REAL FIX) ★★★ =====
+// ==========================================================
+// Next.js-এর বেস কনফিগারেশন থেকে সব নিয়ম আনা হচ্ছে
+const baseConfig = compat.extends("next/core-web-vitals");
+
+// আমরা এখন নতুন একটি কনফিগারেশন অবজেক্ট তৈরি করছি এবং নিয়মটি বন্ধ করে দিচ্ছি
+const customConfig = {
+  ...baseConfig[0], // বেস কনফিগারেশনের প্রথম অবজেক্টটি কপি করা হচ্ছে
+  rules: {
+    ...baseConfig[0].rules, // পুরনো সব নিয়ম রাখা হচ্ছে
+    "react/no-unescaped-entities": "off", // ★★★ এবং এই নিয়মটি বন্ধ করে দেওয়া হচ্ছে ★★★
   },
-  // ==========================================================
-];
+};
+
+const eslintConfig = [customConfig, ...baseConfig.slice(1)];
+// ==========================================================
+
 
 export default eslintConfig;
