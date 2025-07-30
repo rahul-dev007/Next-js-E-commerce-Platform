@@ -1,5 +1,4 @@
 // src/app/login/page.js
-
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -94,7 +93,6 @@ export default function LoginPage() {
         <div className="text-center">
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Sign in to your account</h2>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            {/* ★★★ "Don't" এর পরিবর্তে "Do not" ব্যবহার করা হয়েছে ★★★ */}
             Do not have an account?{" "}
             <Link
               href="/register"

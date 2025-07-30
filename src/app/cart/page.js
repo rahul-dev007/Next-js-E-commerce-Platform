@@ -1,5 +1,4 @@
 // src/app/cart/page.js
-
 "use client";
 
 import Link from 'next/link';
@@ -19,13 +18,10 @@ export default function CartPage() {
     const { data: session } = useSession();
     
     const [isClient, setIsClient] = useState(false);
-    useEffect(() => {
-        setIsClient(true);
-    }, []);
+    useEffect(() => { setIsClient(true); }, []);
 
     const cartItems = useSelector(state => state.cart.cartItems);
     const totalAmount = cartItems.reduce((total, item) => total + item.quantity * item.price, 0);
-
     const [isCheckingOut, setIsCheckingOut] = useState(false);
 
     const handleAddItem = (item) => dispatch(cartActions.addItem(item));
@@ -67,27 +63,20 @@ export default function CartPage() {
     };
     
     if (!isClient) {
-        return (
-            <div className="flex justify-center items-center min-h-screen">
-                <Loader2 className="h-16 w-16 animate-spin text-indigo-500" />
-            </div>
-        );
+        return <div className="flex justify-center items-center min-h-screen"><Loader2 className="h-16 w-16 animate-spin text-indigo-500" /></div>;
     }
 
     return (
         <div className="bg-gray-100 dark:bg-gray-900 min-h-screen py-8">
             <div className="container mx-auto px-4">
                 <h1 className="text-2xl sm:text-4xl font-bold mb-6 text-center text-gray-800 dark:text-white">Your Shopping Cart</h1>
-
                 {cartItems.length === 0 ? (
                     <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-lg shadow-md">
                         <ShoppingCart size={64} className="mx-auto text-gray-400" />
                         <h2 className="mt-6 text-2xl font-semibold text-gray-700 dark:text-gray-300">Your cart is empty</h2>
-                        {/* ★★★ "haven't" এর পরিবর্তে "have not" ব্যবহার করা হয়েছে ★★★ */}
                         <p className="mt-2 text-gray-500 dark:text-gray-400">Looks like you have not added anything to your cart yet.</p>
                         <Link href="/products" className="mt-6 inline-flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-indigo-700 transition">
-                            <ArrowLeft size={20} />
-                            Continue Shopping
+                            <ArrowLeft size={20} /> Continue Shopping
                         </Link>
                     </div>
                 ) : (

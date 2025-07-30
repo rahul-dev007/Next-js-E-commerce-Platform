@@ -20,11 +20,11 @@ const customConfig = {
   ...baseConfig[0],
   rules: {
     ...baseConfig[0].rules,
-    "react/no-unescaped-entities": "off",
+    "react/no-unescaped-entities": "off", // ★★★ "don't" বা "it's" এর মতো শব্দের জন্য এরর দেওয়া বন্ধ করবে ★★★
+    "@next/next/no-img-element": "off", // <img> ট্যাগের warning-ও বন্ধ করে দেওয়া হলো
   },
 };
 
 const eslintConfig = [customConfig, ...baseConfig.slice(1)];
-
 
 export default eslintConfig;

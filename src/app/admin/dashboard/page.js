@@ -48,10 +48,6 @@ export default function AdminDashboardPage() {
         <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
           Welcome back, {session?.user?.name}!
         </h1>
-        {/* ========================================================== */}
-        {/* ===== ★★★ আসল সমাধানটি এখানে (THIS IS THE REAL FIX) ★★★ ===== */}
-        {/* ========================================================== */}
-        {/* ★★★ "Here's" এর পরিবর্তে "Here is" ব্যবহার করা হয়েছে ★★★ */}
         <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">
           Here is a snapshot of your {userRole === 'superadmin' ? 'site' : 'contributions'}.
         </p>
