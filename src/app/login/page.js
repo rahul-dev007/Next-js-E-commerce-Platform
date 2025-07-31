@@ -1,4 +1,5 @@
 // src/app/login/page.js
+
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -6,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import toast from 'react-hot-toast';
 import { Mail, Lock, Eye, EyeOff, Github, Chrome, Loader2 } from "lucide-react";
@@ -16,7 +17,8 @@ const loginSchema = z.object({
   password: z.string().min(1, { message: "Password is required." }),
 });
 
-export default function LoginPage() {
+// ★★★ মূল লগইন ফর্মটি একটি আলাদা কম্পোনেন্টে সরানো হয়েছে ★★★
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl");
@@ -80,15 +82,11 @@ export default function LoginPage() {
   };
   
   if (status === 'loading' || status === 'authenticated') {
-    return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-900">
-            <Loader2 className="h-16 w-16 animate-spin text-indigo-500" />
-        </div>
-    );
+    return <Loader2 className="h-16 w-16 animate-spin text-indigo-500" />;
   }
 
+  // ★★★ আপনার UI কোডটি এখানে அப்படியே আছে, কোনো পরিবর্তন ছাড়াই ★★★
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
       <div className="w-full max-w-md space-y-6 rounded-2xl bg-white p-8 shadow-2xl dark:bg-gray-800">
         <div className="text-center">
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Sign in to your account</h2>
@@ -144,6 +142,16 @@ export default function LoginPage() {
           </div>
         </form>
       </div>
-    </div>
   );
+}
+
+// ★★★ মূল পেজ কম্পোনেন্ট এখন একটি Wrapper ★★★
+export default function LoginPage() {
+    return (
+        <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
+            <Suspense fallback={<Loader2 className="h-16 w-16 animate-spin text-indigo-500" />}>
+                <LoginForm />
+            </Suspense>
+        </div>
+    );
 }
