@@ -1,5 +1,3 @@
-// src/app/api/auth/[...nextauth]/route.js
-
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
@@ -50,7 +48,7 @@ const authOptions = {
                 try {
                     const existingUser = await User.findOne({ email: user.email });
                     if (!existingUser) {
-                        const newUser = await User.create({
+                        await User.create({
                             name: user.name,
                             email: user.email,
                             image: user.image,
@@ -64,11 +62,11 @@ const authOptions = {
             return true;
         },
 
-        async jwt({ token, user, trigger, session }) { 
+        async jwt({ token, user, trigger, session }) {
             if (user) {
                 await connectDB();
                 const dbUser = await User.findOne({ email: user.email });
-                
+
                 if (dbUser) {
                     token.id = dbUser._id.toString();
                     token.role = dbUser.role;
