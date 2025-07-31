@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server';
 import dbConnect from '../../../../lib/db';
 import Product from '../../../../models/Product';
 import { getServerSession } from "next-auth/next";
-import { authOptions } from '../../../api/auth/[...nextauth]/route';
+import { authOptions } from "../../../../lib/authOptions";
 
 // GET ফাংশন (আপনার কোডটি সঠিক ছিল, তাই অপরিবর্তিত)
 export async function GET(request, { params }) {

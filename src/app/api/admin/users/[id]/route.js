@@ -2,7 +2,7 @@
 
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../../auth/[...nextauth]/route";
+import { authOptions } from "../../../../../lib/authOptions";
 import connectDB from "../../../../../lib/db";
 import User from "../../../../../models/User";
 import Product from "../../../../../models/Product"; // ★★★ Product মডেল ইম্পোর্ট করা হয়েছে ★★★

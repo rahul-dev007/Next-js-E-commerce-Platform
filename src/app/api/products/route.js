@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 import dbConnect from '../../../lib/db';
 import Product from '../../../models/Product';
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from "../../../lib/authOptions";
 
 // GET: সব প্রোডাক্টের লিস্ট আনার জন্য
 export async function GET(request) {
