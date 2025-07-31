@@ -4,8 +4,8 @@ import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import dbConnect from "./db"; // সঠিক পাথ
-import User from "../models/User"; // সঠিক পাথ
+import dbConnect from "./db";
+import User from "../models/User";
 
 export const authOptions = {
     providers: [
@@ -19,7 +19,10 @@ export const authOptions = {
         }),
         CredentialsProvider({
             name: "credentials",
-            credentials: { /* ... */ },
+            credentials: {
+                email: { label: "Email", type: "text" },
+                password: { label: "Password", type: "password" },
+            },
             async authorize(credentials) {
                 if (!credentials?.email || !credentials?.password) return null;
                 try {
