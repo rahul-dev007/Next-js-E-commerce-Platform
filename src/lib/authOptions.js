@@ -1,10 +1,11 @@
 // src/lib/authOptions.js
+
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import connectDB from "../lib/db";
-import User from "../models/User";
+import dbConnect from "./db"; // সঠিক পাথ
+import User from "../models/User"; // সঠিক পাথ
 
 export const authOptions = {
     providers: [
@@ -18,21 +19,17 @@ export const authOptions = {
         }),
         CredentialsProvider({
             name: "credentials",
-            credentials: {
-                email: { label: "Email", type: "text" },
-                password: { label: "Password", type: "password" },
-            },
+            credentials: { /* ... */ },
             async authorize(credentials) {
                 if (!credentials?.email || !credentials?.password) return null;
                 try {
-                    await connectDB();
+                    await dbConnect();
                     const user = await User.findOne({ email: credentials.email });
                     if (!user || !user.password) return null;
                     const passwordsMatch = await bcrypt.compare(credentials.password, user.password);
                     if (!passwordsMatch) return null;
                     return user;
                 } catch (error) {
-                    console.log("Error in authorize:", error);
                     return null;
                 }
             },
@@ -44,27 +41,21 @@ export const authOptions = {
     callbacks: {
         async signIn({ user, account }) {
             if (account.provider === "google" || account.provider === "github") {
-                await connectDB();
+                await dbConnect();
                 try {
                     const existingUser = await User.findOne({ email: user.email });
                     if (!existingUser) {
-                        await User.create({
-                            name: user.name,
-                            email: user.email,
-                            image: user.image,
-                        });
+                        await User.create({ name: user.name, email: user.email, image: user.image });
                     }
                 } catch (error) {
-                    console.error("Error in signIn callback:", error);
                     return false;
                 }
             }
             return true;
         },
-
         async jwt({ token, user, trigger, session }) {
             if (user) {
-                await connectDB();
+                await dbConnect();
                 const dbUser = await User.findOne({ email: user.email });
                 if (dbUser) {
                     token.id = dbUser._id.toString();
@@ -74,15 +65,12 @@ export const authOptions = {
                     token.image = dbUser.image;
                 }
             }
-
             if (trigger === "update" && session) {
                 if (session.name) token.name = session.name;
                 if (session.image) token.image = session.image;
             }
-
             return token;
         },
-
         async session({ session, token }) {
             if (token && session.user) {
                 session.user.id = token.id;
