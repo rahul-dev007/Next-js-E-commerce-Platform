@@ -8,7 +8,7 @@ import bcrypt from "bcryptjs";
 import connectDB from "../../../../lib/db";
 import User from "../../../../models/User";
 
-export const authOptions = {
+const authOptions = {
     providers: [
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID,
@@ -50,14 +50,11 @@ export const authOptions = {
                 try {
                     const existingUser = await User.findOne({ email: user.email });
                     if (!existingUser) {
-                        // ★★★ নতুন ইউজার তৈরি হওয়ার পর তার ডেটা user অবজেক্টে যোগ করা হচ্ছে ★★★
                         const newUser = await User.create({
                             name: user.name,
                             email: user.email,
                             image: user.image,
                         });
-                        // signIn callback থেকে user অবজেক্ট পরিবর্তন করা যায় না,
-                        // কিন্তু jwt callback এটি হ্যান্ডেল করবে।
                     }
                 } catch (error) {
                     console.error("Error in signIn callback:", error);
@@ -67,20 +64,14 @@ export const authOptions = {
             return true;
         },
 
-        // ==========================================================
-        // ===== ★★★ আসল সমাধানটি এখানে (THIS IS THE REAL FIX) ★★★ =====
-        // ==========================================================
         async jwt({ token, user, trigger, session }) { 
-            // `user` অবজেক্টটি authorize বা OAuth থেকে প্রথমবার লগইনের সময় আসে
             if (user) {
                 await connectDB();
-                // ডেটাবেস থেকে সর্বশেষ ইউজার তথ্য আনা হচ্ছে
                 const dbUser = await User.findOne({ email: user.email });
                 
                 if (dbUser) {
-                    // ★★★ টোকেনে এখন সবসময় MongoDB-র আসল _id থাকবে ★★★
                     token.id = dbUser._id.toString();
-                    token.role = dbUser.role; // ডেটাবেস থেকে রোল আনা হচ্ছে
+                    token.role = dbUser.role;
                     token.name = dbUser.name;
                     token.email = dbUser.email;
                     token.image = dbUser.image;
