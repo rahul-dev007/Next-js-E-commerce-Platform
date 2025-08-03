@@ -1,4 +1,4 @@
-// src/lib/authOptions.js (Your Code, Corrected)
+// src/lib/authOptions.js (DEBUGGING VERSION)
 
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
@@ -6,6 +6,16 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import dbConnect from "./db";
 import User from "../models/User";
+
+// ★★★★★ আমরা এখন দেখব Vercel আসল মানগুলো পাচ্ছে কি না ★★★★★
+console.log("--- Reading Environment Variables ---");
+console.log("GOOGLE_CLIENT_ID:", process.env.GOOGLE_CLIENT_ID ? "Loaded" : "!!! NOT FOUND !!!");
+console.log("GOOGLE_CLIENT_SECRET:", process.env.GOOGLE_CLIENT_SECRET ? "Loaded" : "!!! NOT FOUND !!!");
+console.log("GITHUB_CLIENT_ID:", process.env.GITHUB_CLIENT_ID ? "Loaded" : "!!! NOT FOUND !!!");
+console.log("GITHUB_CLIENT_SECRET:", process.env.GITHUB_CLIENT_SECRET ? "Loaded" : "!!! NOT FOUND !!!");
+console.log("NEXTAUTH_URL:", process.env.NEXTAUTH_URL || "!!! NOT FOUND !!!");
+console.log("--- Finished Reading ---");
+// ★★★★★ ডিবাগিং শেষ ★★★★★
 
 export const authOptions = {
     providers: [
@@ -18,6 +28,7 @@ export const authOptions = {
             clientSecret: process.env.GITHUB_CLIENT_SECRET,
         }),
         CredentialsProvider({
+            // ... তোমার CredentialsProvider-এর কোড অপরিবর্তিত ...
             name: "credentials",
             credentials: {
                 email: { label: "Email", type: "text" },
@@ -43,6 +54,7 @@ export const authOptions = {
     },
     callbacks: {
         async signIn({ user, account }) {
+            // ... তোমার signIn callback অপরিবর্তিত ...
             if (account.provider === "google" || account.provider === "github") {
                 await dbConnect();
                 try {
@@ -56,41 +68,24 @@ export const authOptions = {
             }
             return true;
         },
-
-        // ★★★★★ আসল এবং ফাইনাল সমাধানটি এখানে ★★★★★
         async jwt({ token, user, trigger, session }) {
-            // যখন ইউজার প্রথমবার লগইন করে
+            // ... তোমার jwt callback অপরিবর্তিত ...
             if (user) {
-                // তোমার কোড অনুযায়ী, আমরা ডেটাবেস থেকে লেটেস্ট তথ্য নিচ্ছি, যা খুবই ভালো
-                await dbConnect();
-
-                // এখানে User.findOne ব্যবহার না করে সরাসরি user অবজেক্ট ব্যবহার করা ভালো
-                // কারণ signIn callback-এ user অবজেক্টটি তৈরি বা খুঁজে পাওয়া যায়
-                token.id = user.id || user._id.toString(); // বিভিন্ন provider থেকে id ভিন্নভাবে আসতে পারে
+                token.id = user.id || user._id.toString();
                 token.role = user.role;
                 token.name = user.name;
                 token.email = user.email;
                 token.image = user.image;
             }
-
-            // যখন ফ্রন্টএন্ড থেকে update() ফাংশন কল করা হয়
             if (trigger === "update" && session) {
-                console.log("JWT callback received update trigger with session:", session);
-
-                // session অবজেক্টের user প্রপার্টি থেকে নতুন ডেটা নিতে হবে
-                // এবং সেটা টোকেনের ভেতর আপডেট করতে হবে
                 token.name = session.user.name;
                 token.image = session.user.image;
-                
-                // NextAuth 'picture' নামে একটি প্রপার্টি ব্যবহার করে, তাই এটিও আপডেট করা ভালো
-                token.picture = session.user.image; 
+                token.picture = session.user.image;
             }
-
             return token;
         },
-        // ★★★★★ সমাধান শেষ ★★★★★
-
         async session({ session, token }) {
+            // ... তোমার session callback অপরিবর্তিত ...
             if (token && session.user) {
                 session.user.id = token.id;
                 session.user.role = token.role;
