@@ -1,4 +1,3 @@
-
 // src/app/api/products/[id]/route.js
 
 import { NextResponse } from 'next/server';
@@ -7,12 +6,14 @@ import Product from '../../../../models/Product';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../../../lib/authOptions";
 
-// GET ফাংশন (আপনার কোডটি সঠিক ছিল, তাই অপরিবর্তিত)
+// GET ফাংশন
 export async function GET(request, { params }) {
-    if (!params || !params.id) {
+    // ★★★ সমাধান এখানে ★★★
+    const { id } = params;
+    
+    if (!id) {
         return NextResponse.json({ success: false, message: "Product ID is missing." }, { status: 400 });
     }
-    const { id } = params;
     
     try {
         await dbConnect();
@@ -27,18 +28,17 @@ export async function GET(request, { params }) {
     }
 }
 
-// ==========================================================
-// ===== ★★★ আসল সমাধানটি এখানে (THIS IS THE REAL FIX) ★★★ =====
-// ==========================================================
-// PATCH: একটি নির্দিষ্ট প্রোডাক্ট আপডেট করার জন্য
+// PATCH ফাংশন
 export async function PATCH(request, { params }) {
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-    if (!params || !params.id) {
+    // ★★★ সমাধান এখানে ★★★
+    const { id } = params;
+
+    if (!id) {
         return NextResponse.json({ success: false, message: "Product ID is missing." }, { status: 400 });
     }
-    const { id } = params;
 
     try {
         await dbConnect();
@@ -49,11 +49,8 @@ export async function PATCH(request, { params }) {
             return NextResponse.json({ message: "Product not found" }, { status: 404 });
         }
         
-        // ★★★ মালিকানা যাচাই করার নির্ভুল পদ্ধতি ★★★
-        // নিশ্চিত করা হচ্ছে যে createdBy ফিল্ডটি স্ট্রিং-এ পরিণত হয়েছে
         const isOwner = productToUpdate.createdBy.toString() === session.user.id.toString();
         
-        // যদি ইউজার মালিক না হয় এবং সে সুপারঅ্যাডমিনও না হয়, তাহলে এরর
         if (!isOwner && session.user.role !== 'superadmin') {
             return NextResponse.json({ message: "You are not authorized to edit this product." }, { status: 403 });
         }
@@ -71,15 +68,17 @@ export async function PATCH(request, { params }) {
     }
 }
 
-// DELETE ফাংশন (এখানেও একই পরিবর্তন করা হয়েছে)
+// DELETE ফাংশন
 export async function DELETE(request, { params }) {
     const session = await getServerSession(authOptions);
     if (!session) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-    if (!params || !params.id) {
+    // ★★★ সমাধান এখানে ★★★
+    const { id } = params;
+    
+    if (!id) {
         return NextResponse.json({ success: false, message: "Product ID is missing." }, { status: 400 });
     }
-    const { id } = params;
     
     try {
         await dbConnect();

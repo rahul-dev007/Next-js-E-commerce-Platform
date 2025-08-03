@@ -1,9 +1,10 @@
+// src/app/api/upload/route.js
+
 import { NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../../lib/authOptions";
 
-// Cloudinary কনফিগার করা হচ্ছে
 cloudinary.config({ 
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
   api_key: process.env.CLOUDINARY_API_KEY, 
@@ -12,8 +13,6 @@ cloudinary.config({
 
 export async function POST(request) {
   const session = await getServerSession(authOptions);
-
-  // শুধুমাত্র লগইন করা ব্যবহারকারীই ইমেজ আপলোড করতে পারবে
   if (!session) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
@@ -21,12 +20,13 @@ export async function POST(request) {
   try {
     const formData = await request.formData();
     const file = formData.get('file');
+    // ★★★ নতুন: ফ্রন্টএন্ড থেকে ফোল্ডারের নাম নেওয়া হচ্ছে ★★★
+    const folderName = formData.get('folderName') || 'my-auth-app-products'; // ডিফল্ট ফোল্ডার
 
     if (!file) {
       return NextResponse.json({ message: "No file provided" }, { status: 400 });
     }
 
-    // ফাইলটিকে buffer-এ রূপান্তর করা হচ্ছে
     const fileBuffer = await file.arrayBuffer();
     const mimeType = file.type;
     const encoding = 'base64';
@@ -35,12 +35,11 @@ export async function POST(request) {
     
     // Cloudinary-তে আপলোড করা হচ্ছে
     const result = await cloudinary.uploader.upload(fileUri, {
-      folder: 'my-auth-app-products', // Cloudinary-তে এই ফোল্ডারে ছবিগুলো জমা হবে
-      public_id: `${Date.now()}-${file.name.split('.')[0]}`, // ফাইলের একটি ইউনিক নাম দেওয়া হচ্ছে
+      folder: folderName, // ★★★ ডাইনামিক ফোল্ডার নাম ব্যবহার করা হচ্ছে ★★★
+      public_id: `${Date.now()}`, 
       resource_type: 'auto'
     });
     
-    // সফল হলে, নিরাপদ URL-টি ফেরত পাঠানো হচ্ছে
     return NextResponse.json({ 
       success: true, 
       message: "Image uploaded successfully",
