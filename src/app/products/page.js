@@ -1,18 +1,19 @@
-// src/app/products/page.js
+// src/app/products/page.js (Final and Correct Version)
 
 "use client";
 
-import { useState, Suspense } from "react"; // ★★★ Suspense ইম্পোর্ট করা হয়েছে ★★★
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useGetProductsQuery } from "../../store/api/productsApi";
+import { useGetProductsQuery } from "../../store/api/apiSlice";
 import { useSession } from "next-auth/react";
-import { Search, PlusCircle, Inbox, Loader2 } from "lucide-react"; // ★★★ Loader2 ইম্পোর্ট ★★★
+import { Search, PlusCircle, Inbox, Loader2 } from "lucide-react";
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+// ★★★ THIS IS THE REAL FIX: We are now importing the CORRECT card component ★★★
 import ShopProductCard from '../../components/ShopProductCard';
 
-// Product Card Skeleton Component (অপরিবর্তিত)
+// Product Card Skeleton Component (Unchanged)
 function ProductCardSkeleton() {
     return (
         <div className="rounded-xl bg-white shadow-lg dark:bg-gray-800 overflow-hidden">
@@ -29,19 +30,20 @@ function ProductCardSkeleton() {
     );
 }
 
-// Pagination Component (অপরিবর্তিত)
+// Pagination Component (Unchanged)
 function Pagination({ currentPage, totalPages, onPageChange }) {
     if (totalPages <= 1) return null;
+    // Assuming you have your button classes here
     return (
         <div className="mt-12 flex items-center justify-center space-x-4">
-            <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1} className="rounded-lg ...">Previous</button>
+            <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-gray-400">Previous</button>
             <span className="text-gray-700 dark:text-gray-300">Page {currentPage} of {totalPages}</span>
-            <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages} className="rounded-lg ...">Next</button>
+            <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-gray-400">Next</button>
         </div>
     );
 }
 
-// ★★★ মূল প্রোডাক্ট লিস্টটি একটি আলাদা কম্পোনেন্টে সরানো হয়েছে ★★★
+// Product List Component (Unchanged)
 function ProductList() {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -49,10 +51,10 @@ function ProductList() {
 
     const page = parseInt(searchParams.get('page') || '1');
     const search = searchParams.get('search') || '';
-    
+
     const [searchTerm, setSearchTerm] = useState(search);
     const { data: response, error, isLoading, isFetching } = useGetProductsQuery({ page, search });
-    
+
     const products = response?.products;
     const pagination = response?.pagination;
     const isAdmin = session?.user?.role === 'admin' || session?.user?.role === 'superadmin';
@@ -84,6 +86,7 @@ function ProductList() {
             return (
                 <div>
                     <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        {/* We are now correctly using ShopProductCard here */}
                         {products.map((product) => <ShopProductCard key={product._id} product={product} />)}
                     </div>
                     {pagination && <Pagination currentPage={pagination.currentPage} totalPages={pagination.totalPages} onPageChange={handlePageChange} />}
@@ -129,7 +132,7 @@ function ProductList() {
     );
 }
 
-// ★★★ মূল পেজ কম্পোনেন্ট এখন একটি Wrapper ★★★
+// Main Page Component (Wrapper) - Unchanged
 export default function ProductsPage() {
     return (
         <div className="bg-gray-50 dark:bg-gray-900/50 min-h-screen">

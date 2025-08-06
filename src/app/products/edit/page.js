@@ -9,7 +9,7 @@ import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
 
 // সঠিক Relative Path ব্যবহার করা হয়েছে
-import { useGetProductByIdQuery, useUpdateProductMutation } from "../../../store/api/productsApi";
+import { useGetProductByIdQuery, useUpdateProductMutation } from "../../../store/api/apiSlice";
 
 const productSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters."),

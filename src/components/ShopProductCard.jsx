@@ -1,116 +1,108 @@
-// src/components/ShopProductCard.jsx
+// src/components/ShopProductCard.jsx (চূড়ান্ত সংস্করণ - উপর থেকে ভেসে ওঠা আইকনসহ)
 
-'use client';
-
-import Image from 'next/image';
 import Link from 'next/link';
-import { Heart, MessageSquare, ShoppingCart } from 'lucide-react';
-import { useSession } from 'next-auth/react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { ShoppingCart, Heart, MessageSquare } from 'lucide-react';
 import { useDispatch } from 'react-redux';
-import { useLikeProductMutation } from '../store/api/productsApi';
 import { cartActions } from '../store/cartSlice';
+import { useLikeProductMutation } from '../store/api/apiSlice';
+import toast from 'react-hot-toast';
 
 export default function ShopProductCard({ product }) {
     const dispatch = useDispatch();
-    const { data: session } = useSession();
+    const router = useRouter();
     const [likeProduct, { isLoading: isLiking }] = useLikeProductMutation();
 
-    const isLikedByCurrentUser = product.likes?.includes(session?.user?.id);
+    if (!product) return null;
 
-    const handleLikeClick = async (e) => {
+    const handleActionClick = (e, action) => {
+        e.stopPropagation();
         e.preventDefault();
-        if (!session) {
-            // toast.error("Please log in to like."); // toast ব্যবহার করতে চাইলে ইম্পোর্ট করে নেবেন
-            return;
-        }
-        try {
-            await likeProduct(product._id).unwrap();
-        } catch (err) {
-            // toast.error("Failed to like.");
-        }
+        action();
     };
 
-    const handleAddToCart = (e) => {
-        e.preventDefault();
-        dispatch(cartActions.addItem({
-            _id: product._id,
-            name: product.name,
-            price: product.price,
-            imageUrl: product.imageUrl,
-        }));
+    const handleLike = () => {
+        likeProduct(product._id).unwrap()
+            .then(() => toast.success('Thanks for your feedback!'))
+            .catch((err) => toast.error(err?.data?.message || 'Could not like product.'));
+    };
+    
+    const handleAddToCart = () => {
+        dispatch(cartActions.addItem(product));
     };
 
-    const imageUrl = product.imageUrl?.startsWith('https://res.cloudinary.com') ? product.imageUrl : '/placeholder.png';
+    const handleCommentClick = () => {
+        router.push(`/products/${product._id}#comments`);
+    };
 
     return (
-        <div className="group relative flex flex-col overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1.5">
-            <Link href={`/products/${product._id}`} className="block">
-                <div className="relative h-64 w-full">
-                    <Image
-                        src={imageUrl}
-                        alt={product.name}
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        className="object-cover transition-transform duration-500 group-hover:scale-110"
-                        unoptimized={true}
-                    />
-                </div>
-            </Link>
-
-            <div className="absolute top-4 right-4 flex flex-col gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <Link 
+            href={`/products/${product._id}`}
+            className="group relative block bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2"
+        >
+            <div className="relative w-full overflow-hidden aspect-[4/3]">
+                <Image
+                    src={product.imageUrl}
+                    alt={product.name}
+                    fill
+                    className="object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+            </div>
+            
+            {/* 
+              ★★★ আসল সমাধান এখানে ★★★
+              - `justify-center` পরিবর্তন করে `justify-start` করা হয়েছে।
+              - `pt-8` যোগ করে উপর থেকে কিছুটা গ্যাপ তৈরি করা হয়েছে।
+            */}
+            <div className="absolute inset-0 flex flex-col items-end justify-start gap-3 p-4 pt-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                 <button 
-                    onClick={handleLikeClick}
-                    disabled={isLiking || !session}
-                    className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-3 rounded-full shadow-lg transition-colors focus:outline-none disabled:cursor-not-allowed"
-                    title="Add to Wishlist"
+                    onClick={(e) => handleActionClick(e, handleLike)} 
+                    disabled={isLiking} 
+                    className="p-3 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-full text-gray-800 dark:text-gray-200 hover:text-red-500 dark:hover:text-red-400 shadow-lg transition-all duration-300 transform translate-x-10 group-hover:translate-x-0 pointer-events-auto"
+                    title="Like"
                 >
-                    <Heart 
-                        size={20} 
-                        className={isLikedByCurrentUser ? 'text-red-500 fill-current' : 'text-gray-700 dark:text-gray-300 hover:text-red-500'} 
-                    />
+                    <Heart />
                 </button>
-                <Link 
-                    href={`/products/${product._id}#comments`}
-                    className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-3 rounded-full shadow-lg text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
-                    title="View Comments"
-                >
-                    <MessageSquare size={20} />
-                </Link>
                 <button 
-                    onClick={handleAddToCart}
-                    className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-3 rounded-full shadow-lg text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors focus:outline-none"
+                    onClick={(e) => handleActionClick(e, handleCommentClick)} 
+                    className="p-3 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-full text-gray-800 dark:text-gray-200 hover:text-blue-500 dark:hover:text-blue-400 shadow-lg transition-all duration-300 transform translate-x-10 group-hover:translate-x-0 delay-100 pointer-events-auto"
+                    title="Comment"
+                >
+                    <MessageSquare />
+                </button>
+                <button 
+                    onClick={(e) => handleActionClick(e, handleAddToCart)} 
+                    className="p-3 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-full text-gray-800 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 shadow-lg transition-all duration-300 transform translate-x-10 group-hover:translate-x-0 delay-200 pointer-events-auto"
                     title="Add to Cart"
                 >
-                    <ShoppingCart size={20} />
+                    <ShoppingCart />
                 </button>
             </div>
-
-            <div className="p-5 flex flex-col flex-grow">
-                <p className="text-sm font-medium text-indigo-600 dark:text-indigo-400">{product.category}</p>
-                <h3 className="mt-1 text-xl font-bold text-gray-900 dark:text-white truncate">
-                    <Link href={`/products/${product._id}`} className="hover:text-indigo-600 transition-colors">{product.name}</Link>
+            
+            <div className="p-4">
+                <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">{product.category}</p>
+                <h3 className="font-bold text-gray-900 dark:text-white truncate text-lg mt-1">
+                    {product.name}
                 </h3>
                 
-                <div className="mt-3 flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                    <div className="flex items-center gap-1.5">
-                        <Heart size={16} className={product.likeCount > 0 ? 'text-red-400' : ''}/>
-                        <span>{product.likeCount || 0}</span>
+                <div className="mt-4 flex justify-between items-center">
+                    <p className="font-semibold text-indigo-600 dark:text-indigo-400 text-xl">
+                        ${product.price ? product.price.toFixed(2) : '0.00'}
+                    </p>
+                    <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+                        <div className="flex items-center gap-1.5" title={`${product.likeCount ?? 0} Likes`}>
+                            <Heart size={16} />
+                            <span>{product.likeCount ?? 0}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5" title={`${product.commentCount ?? 0} Comments`}>
+                            <MessageSquare size={16} />
+                            <span>{product.commentCount ?? 0}</span>
+                        </div>
                     </div>
-                    <Link href={`/products/${product._id}#comments`} className="flex items-center gap-1.5 hover:text-blue-500 transition-colors">
-                        <MessageSquare size={16} />
-                        <span>{product.commentCount || 0}</span>
-                    </Link>
-                </div>
-
-                <div className="flex-grow"></div>
-
-                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                    <span className="text-2xl font-extrabold text-gray-800 dark:text-white">${product.price?.toFixed(2) || '0.00'}</span>
-                    <button onClick={handleAddToCart} className="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-colors hover:bg-indigo-700">
-                        Add to Cart
-                    </button>
                 </div>
             </div>
-        </div>
+        </Link>
     );
 }

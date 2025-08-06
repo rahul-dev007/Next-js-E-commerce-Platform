@@ -36,3 +36,18 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+
+/* src/app/globals.css */
+
+/* ... তোমার পুরনো CSS ... */
+
+/* ★★★ নতুন মার্কি অ্যানিমেশন এখানে যোগ করা হয়েছে ★★★ */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-100%); }
+}
+
+.animate-marquee {
+  animation: marquee 40s linear infinite;
+}

@@ -11,7 +11,7 @@ import "./globals.css";
 import AuthProvider from "../components/AuthProvider";
 import StoreProvider from "../components/StoreProvider";
 import ReactQueryProvider from "../components/ReactQueryProvider";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/layout/Navbar";
 import Footer from '../components/layout/Footer';
 
 // ★★★ নতুন: UserProvider ইম্পোর্ট করুন ★★★

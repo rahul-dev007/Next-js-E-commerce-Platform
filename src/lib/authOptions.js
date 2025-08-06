@@ -7,15 +7,6 @@ import bcrypt from "bcryptjs";
 import dbConnect from "./db";
 import User from "../models/User";
 
-// ★★★★★ আমরা এখন দেখব Vercel আসল মানগুলো পাচ্ছে কি না ★★★★★
-console.log("--- Reading Environment Variables ---");
-console.log("GOOGLE_CLIENT_ID:", process.env.GOOGLE_CLIENT_ID ? "Loaded" : "!!! NOT FOUND !!!");
-console.log("GOOGLE_CLIENT_SECRET:", process.env.GOOGLE_CLIENT_SECRET ? "Loaded" : "!!! NOT FOUND !!!");
-console.log("GITHUB_CLIENT_ID:", process.env.GITHUB_CLIENT_ID ? "Loaded" : "!!! NOT FOUND !!!");
-console.log("GITHUB_CLIENT_SECRET:", process.env.GITHUB_CLIENT_SECRET ? "Loaded" : "!!! NOT FOUND !!!");
-console.log("NEXTAUTH_URL:", process.env.NEXTAUTH_URL || "!!! NOT FOUND !!!");
-console.log("--- Finished Reading ---");
-// ★★★★★ ডিবাগিং শেষ ★★★★★
 
 export const authOptions = {
     providers: [

@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 import { useSession } from 'next-auth/react';
 import { Edit, Trash2, PlusCircle, Search, Inbox } from "lucide-react";
 
-import { useGetProductsQuery, useDeleteProductMutation } from "../../../store/api/productsApi";
+import { useGetProductsQuery, useDeleteProductMutation } from "../../../store/api/apiSlice";
 import ConfirmationModal from "../../../components/common/ConfirmationModal";
 import TableSkeleton from "../../../components/common/TableSkeleton";
 
@@ -19,9 +19,9 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
     if (totalPages <= 1) return null;
     return (
         <div className="mt-8 flex items-center justify-center space-x-2 sm:space-x-4">
-            <button 
-                onClick={() => onPage-change(currentPage - 1)} 
-                disabled={currentPage === 1} 
+            <button
+                onClick={() => onPage - change(currentPage - 1)}
+                disabled={currentPage === 1}
                 className="rounded-lg bg-indigo-600 px-3 sm:px-4 py-2 text-sm font-semibold text-white shadow-md transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-gray-400 dark:disabled:bg-gray-600"
             >
                 Previous
@@ -29,9 +29,9 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
             <span className="text-sm text-gray-700 dark:text-gray-300">
                 Page {currentPage} of {totalPages}
             </span>
-            <button 
-                onClick={() => onPageChange(currentPage + 1)} 
-                disabled={currentPage === totalPages} 
+            <button
+                onClick={() => onPageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
                 className="rounded-lg bg-indigo-600 px-3 sm:px-4 py-2 text-sm font-semibold text-white shadow-md transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-gray-400 dark:disabled:bg-gray-600"
             >
                 Next
@@ -46,18 +46,18 @@ export default function AdminProductsPage() {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const { data: session } = useSession();
-    
+
     const page = parseInt(searchParams.get('page') || '1');
     const search = searchParams.get('search') || '';
-    
+
     const [searchTerm, setSearchTerm] = useState(search);
     const [productToDelete, setProductToDelete] = useState(null);
 
     const userScope = session?.user?.role === 'superadmin' ? '' : 'me';
     const { data: response, isLoading, isFetching, error } = useGetProductsQuery({ page, search, scope: userScope });
-    
+
     const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation();
-    
+
     // ==========================================================
     // ===== ★★★ আসল সমাধানটি এখানে (THIS IS THE REAL FIX) ★★★ =====
     // ==========================================================
@@ -65,7 +65,7 @@ export default function AdminProductsPage() {
     const products = response?.products;
     const pagination = response?.pagination;
     // ==========================================================
-    
+
     const userRole = session?.user?.role;
 
     const handleUrlChange = (newParams) => {
@@ -189,7 +189,7 @@ export default function AdminProductsPage() {
                         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage all products in your inventory.</p>
                     </div>
                     <div className="flex w-full sm:w-auto items-center gap-2">
-                         <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-auto">
+                        <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-auto">
                             <input
                                 type="text"
                                 value={searchTerm}
@@ -202,7 +202,7 @@ export default function AdminProductsPage() {
                             </button>
                         </form>
                         <Link href="/products/add" className="flex-shrink-0 flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-indigo-700 transition-colors">
-                            <PlusCircle size={20} /> 
+                            <PlusCircle size={20} />
                             <span className="hidden sm:inline">Add Product</span>
                         </Link>
                     </div>

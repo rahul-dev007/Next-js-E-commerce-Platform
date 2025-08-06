@@ -8,7 +8,7 @@ import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Loader2, UploadCloud } from "lucide-react";
-import { useAddProductMutation } from "../../../store/api/productsApi";
+import { useAddProductMutation } from "../../../store/api/apiSlice";
 import toast from 'react-hot-toast';
 import Image from "next/image";
 
@@ -35,8 +35,8 @@ export default function AddProductPage() {
     const file = e.target.files[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-          toast.error("Image file size cannot exceed 5MB.");
-          return;
+        toast.error("Image file size cannot exceed 5MB.");
+        return;
       }
       setImageFile(file);
       const reader = new FileReader();
@@ -60,13 +60,13 @@ export default function AddProductPage() {
       try {
         const imageUploadData = new FormData();
         imageUploadData.append('file', imageFile);
-        
+
         const uploadResponse = await fetch('/api/upload', {
           method: 'POST',
           body: imageUploadData,
         });
         const uploadResult = await uploadResponse.json();
-        
+
         if (!uploadResponse.ok) {
           throw new Error(uploadResult.message || "Image upload failed");
         }
@@ -87,7 +87,7 @@ export default function AddProductPage() {
       setIsSubmitting(false);
     }
   };
-  
+
   if (status === "loading") {
     return <div className="flex justify-center items-center min-h-screen"><Loader2 className="h-10 w-10 animate-spin" /></div>;
   }
@@ -99,7 +99,7 @@ export default function AddProductPage() {
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Add a New Product</h2>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Fill out the form below to add a new product to your store.</p>
         </div>
-        
+
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Product Image</label>
@@ -120,7 +120,7 @@ export default function AddProductPage() {
               </div>
             </div>
           </div>
-          
+
           <div>
             <label htmlFor="name" className="block text-sm font-medium">Product Name</label>
             <input id="name" type="text" {...register("name")} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
@@ -132,18 +132,18 @@ export default function AddProductPage() {
             {errors.description && <p className="mt-1 text-sm text-red-500">{errors.description.message}</p>}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-             <div>
-                <label htmlFor="price" className="block text-sm font-medium">Price ($)</label>
-                <input id="price" type="number" step="0.01" {...register("price")} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
-                {errors.price && <p className="mt-1 text-sm text-red-500">{errors.price.message}</p>}
-              </div>
-              <div>
-                <label htmlFor="category" className="block text-sm font-medium">Category</label>
-                <input id="category" type="text" {...register("category")} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
-                {errors.category && <p className="mt-1 text-sm text-red-500">{errors.category.message}</p>}
-              </div>
+            <div>
+              <label htmlFor="price" className="block text-sm font-medium">Price ($)</label>
+              <input id="price" type="number" step="0.01" {...register("price")} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
+              {errors.price && <p className="mt-1 text-sm text-red-500">{errors.price.message}</p>}
+            </div>
+            <div>
+              <label htmlFor="category" className="block text-sm font-medium">Category</label>
+              <input id="category" type="text" {...register("category")} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
+              {errors.category && <p className="mt-1 text-sm text-red-500">{errors.category.message}</p>}
+            </div>
           </div>
-          
+
           <button type="submit" disabled={isSubmitting} className="flex w-full items-center justify-center rounded-lg bg-indigo-600 py-3 px-4 text-base font-semibold text-white shadow-md transition duration-300 ease-in-out hover:bg-indigo-700 disabled:bg-indigo-400 disabled:cursor-not-allowed">
             {isSubmitting && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
             {isSubmitting ? "Submitting..." : "Add Product"}
