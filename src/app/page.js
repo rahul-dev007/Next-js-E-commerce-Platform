@@ -17,22 +17,12 @@ import TestimonialSlider from "../components/TestimonialSlider";
 import SeasonalOffer from "../components/SeasonalOffer";
 import FeatureSlider from "../components/FeatureSlider";
 
-// ===================================
-// ===== FeaturedProducts Component =====
-// ===================================
-// src/app/page.js ফাইলের ভিতরে
-// src/app/page.js ফাইলের ভিতরে
-
-// src/app/page.js ফাইলের ভিতরে
-
-// ===================================
-// ===== FeaturedProducts Component =====
-// ===================================
+// ★★★ FeaturedProducts কম্পোনেন্ট তৈরি করা হচ্ছে ★★★
 function FeaturedProducts() {
     const { data, isLoading, error } = useGetProductsQuery({ page: 1 });
     
     // মার্কির জন্য আমরা ৬টি প্রোডাক্ট নিচ্ছি
-    const products = data?.products?.slice(0, 6) || [];
+    const products = data?.products?.slice(0, 10) || [];
     
     // অসীম এবং মসৃণ স্ক্রলিংয়ের অনুভূতি তৈরি করার জন্য আমরা তালিকাটিকে ডুপ্লিকেট করছি
     // যদি ৬টির কম প্রোডাক্ট থাকে, তাহলে তালিকাটি কয়েকবার ডুপ্লিকেট করা হবে

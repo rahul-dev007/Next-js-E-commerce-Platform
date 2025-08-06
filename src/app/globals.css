@@ -39,15 +39,80 @@ body {
 
 
 /* src/app/globals.css */
+/* ... তোমার অন্যান্য TailwindCSS import গুলো থাকবে ... */
 
-/* ... তোমার পুরনো CSS ... */
-
-/* ★★★ নতুন মার্কি অ্যানিমেশন এখানে যোগ করা হয়েছে ★★★ */
-@keyframes marquee {
-  0% { transform: translateX(0%); }
-  100% { transform: translateX(-100%); }
+@keyframes aurora {
+  from {
+    background-position: 50% 50%, 50% 50%;
+  }
+  to {
+    background-position: 350% 50%, 350% 50%;
+  }
 }
 
-.animate-marquee {
-  animation: marquee 40s linear infinite;
+.aurora-background {
+  position: relative;
+  background-image: 
+    radial-gradient(
+      ellipse 100% 100% at 100% 0,
+      #182358 0,
+      rgba(24, 35, 88, 0) 50%
+    ),
+    radial-gradient(
+      ellipse 100% 100% at 0 100%,
+      #2d1c57 0,
+      rgba(45, 28, 87, 0) 50%
+    );
+  background-size: 1000px 1000px; /* Gradient এর সাইজ */
+  background-position: 50% 50%;
+  animation: aurora 20s linear infinite;
+  color: #e5e7eb; /* ডিফল্ট টেক্সট কালার */
+}
+
+body {
+  background-color: #0b0f19; /* ডার্ক ব্যাকগ্রাউন্ড কালার */
+}
+
+
+
+/* ... aurora-background এবং অন্যান্য CSS অপরিবর্তিত থাকবে ... */
+
+/* Card glass effect - Updated for better contrast */
+.card-glass {
+  background: rgba(21, 25, 43, 0.75); /* Opacity বাড়ানো হয়েছে: 0.5 -> 0.75 */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12); /* Border আরেকটু স্পষ্ট করা হয়েছে */
+  border-radius: 1rem;
+  transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-glass:hover {
+  background: rgba(21, 25, 43, 0.85); /* Hover-এ আরও ডার্ক হবে */
+  box-shadow: 0 0 25px rgba(128, 147, 255, 0.25);
+  transform: translateY(-2px); /* হালকা উপরে উঠবে */
+}
+
+/* Modal glass effect - Updated for better contrast */
+.modal-glass {
+  background: rgba(30, 35, 60, 0.9); /* Opacity অনেক বাড়ানো হয়েছে */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* ... বাকি CSS অপরিবর্তিত ... */
+/* Scrollbar styling (optional but nice) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0b0f19;
+}
+::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #4b5563;
 }

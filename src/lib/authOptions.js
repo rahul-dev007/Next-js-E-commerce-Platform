@@ -1,14 +1,14 @@
-// src/lib/authOptions.js (DEBUGGING VERSION)
+// src/lib/authOptions.js (তোমার দেওয়া কোড)
 
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import dbConnect from "./db";
-import User from "../models/User";
-
+import dbConnect from "./db"; // ★★★ এই পাথটিই ব্যবহার করা হবে
+import User from "../models/User"; // ★★★ এই পাথটিও ব্যবহার করা হবে
 
 export const authOptions = {
+    // ... বাকি সব কোড অপরিবর্তিত থাকবে যা তুমি দিয়েছিলে ...
     providers: [
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID,
@@ -19,7 +19,6 @@ export const authOptions = {
             clientSecret: process.env.GITHUB_CLIENT_SECRET,
         }),
         CredentialsProvider({
-            // ... তোমার CredentialsProvider-এর কোড অপরিবর্তিত ...
             name: "credentials",
             credentials: {
                 email: { label: "Email", type: "text" },
@@ -45,13 +44,12 @@ export const authOptions = {
     },
     callbacks: {
         async signIn({ user, account }) {
-            // ... তোমার signIn callback অপরিবর্তিত ...
             if (account.provider === "google" || account.provider === "github") {
                 await dbConnect();
                 try {
                     const existingUser = await User.findOne({ email: user.email });
                     if (!existingUser) {
-                        await User.create({ name: user.name, email: user.email, image: user.image });
+                        await User.create({ name: user.name, email: user.email, image: user.image, role: 'user' });
                     }
                 } catch (error) {
                     return false;
@@ -60,7 +58,6 @@ export const authOptions = {
             return true;
         },
         async jwt({ token, user, trigger, session }) {
-            // ... তোমার jwt callback অপরিবর্তিত ...
             if (user) {
                 token.id = user.id || user._id.toString();
                 token.role = user.role;
@@ -71,12 +68,10 @@ export const authOptions = {
             if (trigger === "update" && session) {
                 token.name = session.user.name;
                 token.image = session.user.image;
-                token.picture = session.user.image;
             }
             return token;
         },
         async session({ session, token }) {
-            // ... তোমার session callback অপরিবর্তিত ...
             if (token && session.user) {
                 session.user.id = token.id;
                 session.user.role = token.role;

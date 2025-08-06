@@ -1,4 +1,4 @@
-// next.config.mjs (Your code, updated correctly)
+// next.config.mjs (তোমার কোড, সঠিকভাবে আপডেট করা)
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -7,7 +7,6 @@ const nextConfig = {
     ignoreDuringBuilds: true, // ESLint error গুলো Vercel build এ skip হবে
   },
   
-  // ★★★★★ নতুন কনফিগারেশনটি এখানে যোগ করা হয়েছে ★★★★★
   images: {
     remotePatterns: [
       {
@@ -27,6 +26,13 @@ const nextConfig = {
         hostname: 'lh3.googleusercontent.com', // Google-এর ছবির জন্য
         port: '',
         pathname: '/**',
+      },
+      // ★★★★★ নতুন কনফিগারেশনটি এখানে যোগ করা হয়েছে ★★★★★
+      {
+        protocol: 'https',
+        hostname: 'ui-avatars.com', // UI Avatars API-এর ছবির জন্য
+        port: '',
+        pathname: '/api/**', // শুধু /api/ পাথ থেকে ছবি লোড হবে
       },
     ],
   },

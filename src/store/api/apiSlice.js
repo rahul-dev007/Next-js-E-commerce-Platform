@@ -8,45 +8,54 @@ export const apiSlice = createApi({
   tagTypes: ['Product', 'User', 'Notification', 'Stats'],
 
   endpoints: (builder) => ({
-    
+
     // ... তোমার অন্যান্য এন্ডপয়েন্ট (getProducts, getUsers, ইত্যাদি) অপরিবর্তিত থাকবে ...
     getProducts: builder.query({
-        query: ({ page = 1, search = '', scope = '' }) => `products?page=${page}&search=${search}&scope=${scope}`,
-        transformResponse: (response) => response.data || { products: [], pagination: {} },
-        providesTags: (result) => result?.products ? [...result.products.map(({ _id }) => ({ type: 'Product', id: _id })), { type: 'Product', id: 'LIST' }] : [{ type: 'Product', id: 'LIST' }],
+      query: ({ page = 1, search = '', scope = '' }) => `products?page=${page}&search=${search}&scope=${scope}`,
+      transformResponse: (response) => response.data || { products: [], pagination: {} },
+      providesTags: (result) => result?.products ? [...result.products.map(({ _id }) => ({ type: 'Product', id: _id })), { type: 'Product', id: 'LIST' }] : [{ type: 'Product', id: 'LIST' }],
     }),
     getProductById: builder.query({
-        query: (id) => `products/${id}`,
-        transformResponse: (response) => response.data,
-        providesTags: (result, error, id) => [{ type: 'Product', id }],
+      query: (id) => `products/${id}`,
+      transformResponse: (response) => response.data,
+      providesTags: (result, error, id) => [{ type: 'Product', id }],
     }),
     addProduct: builder.mutation({
-        query: (newProduct) => ({ url: '/products', method: 'POST', body: newProduct }),
-        invalidatesTags: [{ type: 'Product', id: 'LIST' }],
+      query: (newProduct) => ({ url: '/products', method: 'POST', body: newProduct }),
+      invalidatesTags: [{ type: 'Product', id: 'LIST' }],
     }),
     updateProduct: builder.mutation({
-        query: ({ id, ...patch }) => ({ url: `products/${id}`, method: 'PATCH', body: patch }),
-        invalidatesTags: (result, error, { id }) => [{ type: 'Product', id }, { type: 'Product', id: 'LIST' }],
+      query: ({ id, ...patch }) => ({ url: `products/${id}`, method: 'PATCH', body: patch }),
+      invalidatesTags: (result, error, { id }) => [{ type: 'Product', id }, { type: 'Product', id: 'LIST' }],
     }),
     deleteProduct: builder.mutation({
-        query: (id) => ({ url: `products/${id}`, method: 'DELETE' }),
-        invalidatesTags: (result, error, { id }) => [{ type: 'Product', id: 'LIST' }],
+      query: (id) => ({ url: `products/${id}`, method: 'DELETE' }),
+      invalidatesTags: (result, error, { id }) => [{ type: 'Product', id: 'LIST' }],
     }),
+
     getUsers: builder.query({
-        query: () => 'admin/users',
-        providesTags: ['User']
+      query: () => 'admin/users',
+      // ★★★ এই অংশটি যোগ করলে ভালো হয় ★★★
+      transformResponse: (response) => response.data || [], // নিশ্চিত করে যে data প্রপার্টি রিটার্ন হবে, না থাকলে খালি অ্যারে
+      providesTags: (result) =>
+        result ?
+          [...result.map(({ _id }) => ({ type: 'User', id: _id })), { type: 'User', id: 'LIST' }]
+          : [{ type: 'User', id: 'LIST' }],
     }),
+
     updateUserRole: builder.mutation({
-        query: ({ id, role }) => ({ url: `admin/users/${id}`, method: 'PUT', body: { role } }),
-        invalidatesTags: ['User']
+      query: ({ id, role }) => ({ url: `admin/users/${id}`, method: 'PUT', body: { role } }),
+      invalidatesTags: (result, error, { id }) => [{ type: 'User', id }, { type: 'User', id: 'LIST' }], // এভাবে করলে আরো নিখুঁতভাবে ইনভ্যালিডেট হয়
     }),
+
     deleteUser: builder.mutation({
-        query: (id) => ({ url: `admin/users/${id}`, method: 'DELETE' }),
-        invalidatesTags: ['User']
+      query: (id) => ({ url: `admin/users/${id}`, method: 'DELETE' }),
+      invalidatesTags: [{ type: 'User', id: 'LIST' }],
     }),
+
     getAdminStats: builder.query({
-        query: () => 'admin/stats',
-        providesTags: ['Stats', 'Product', 'User']
+      query: () => 'admin/stats',
+      providesTags: ['Stats', 'Product', 'User']
     }),
     getNotifications: builder.query({
       query: () => 'notifications',
@@ -60,7 +69,7 @@ export const apiSlice = createApi({
     // ==========================================================
     // ===== ★★★ আসল সমাধানটি এখানে (The Real Fix) ★★★ =====
     // ==========================================================
-    
+
     likeProduct: builder.mutation({
       query: (productId) => ({ url: `products/${productId}/like`, method: 'POST' }),
       // প্রথমে প্রোডাক্ট ট্যাগ ইনভ্যালিডেট করা হচ্ছে
