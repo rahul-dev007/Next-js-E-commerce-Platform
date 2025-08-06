@@ -116,3 +116,53 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #4b5563;
 }
+
+
+
+
+
+
+/* HeroImage style css */
+@keyframes shine {
+  from {
+    transform: translateX(-100%) skewX(-15deg);
+  }
+  to {
+    transform: translateX(200%) skewX(-15deg);
+  }
+}
+
+.shine-overlay::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shine 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+
+/* ★★★★★ মার্কি অ্যানিমেশনের জন্য এই কোডটুকু যোগ করো ★★★★★ */
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* ★★★★★ এই পর্যন্ত ★★★★★ */
