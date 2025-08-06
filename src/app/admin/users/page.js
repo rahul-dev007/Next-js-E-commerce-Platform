@@ -7,7 +7,7 @@ import { useSession } from 'next-auth/react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { Edit, Trash2, Inbox, ShieldAlert, Loader2 } from 'lucide-react';
-import { useGetUsersQuery, useUpdateUserRoleMutation, useDeleteUserMutation } from '../../../store/api/usersApi';
+import { useGetUsersQuery, useUpdateUserRoleMutation, useDeleteUserMutation } from '../../../store/api/apiSlice';
 import ConfirmationModal from '../../../components/common/ConfirmationModal';
 import TableSkeleton from '../../../components/common/TableSkeleton';
 
