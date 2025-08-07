@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-// ★★★ Star আইকন ইম্পোর্ট করা হয়েছে ★★★
+import { useState } from 'react';
 import { ShoppingCart, Heart, MessageSquare, Star } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { cartActions } from '../store/cartSlice';
@@ -11,21 +11,18 @@ import { useLikeProductMutation } from '../store/api/apiSlice';
 import { useSession } from 'next-auth/react';
 import toast from 'react-hot-toast';
 
-// ★★★ রেটিং স্টার দেখানোর জন্য একটি নতুন, রি-ইউজেবল কম্পোনেন্ট ★★★
+// রেটিং স্টার কম্পোনেন্ট
 function RatingStars({ rating = 0, numReviews = 0 }) {
-    const fullStars = Math.floor(rating);
-    const halfStar = rating % 1 >= 0.5;
-    const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+    const validRating = Number(rating) || 0;
+    const fullStars = Math.floor(validRating);
+    const halfStar = validRating % 1 >= 0.5;
+    const emptyStars = Math.max(0, 5 - fullStars - (halfStar ? 1 : 0));
 
     return (
         <div className="flex items-center gap-1">
-            {[...Array(fullStars)].map((_, i) => (
-                <Star key={`full-${i}`} size={16} className="text-yellow-400 fill-current" />
-            ))}
+            {[...Array(fullStars)].map((_, i) => <Star key={`full-${i}`} size={16} className="text-yellow-400 fill-current" />)}
             {halfStar && <Star size={16} className="text-yellow-400" />}
-            {[...Array(emptyStars)].map((_, i) => (
-                <Star key={`empty-${i}`} size={16} className="text-gray-300 dark:text-gray-600" />
-            ))}
+            {[...Array(emptyStars)].map((_, i) => <Star key={`empty-${i}`} size={16} className="text-gray-300 dark:text-gray-600" />)}
             {numReviews > 0 && <span className="ml-1 text-xs text-gray-500">({numReviews})</span>}
         </div>
     );
@@ -37,6 +34,9 @@ export default function ShopProductCard({ product }) {
     const dispatch = useDispatch();
     const router = useRouter();
     const [likeProduct, { isLoading: isLiking }] = useLikeProductMutation();
+    
+    // মোবাইলে ট্যাপ করার অবস্থা ট্র্যাক করার জন্য নতুন স্টেট
+    const [isMobileTapped, setIsMobileTapped] = useState(false);
 
     if (!product) return null;
 
@@ -62,10 +62,28 @@ export default function ShopProductCard({ product }) {
     const handleCommentClick = () => {
         router.push(`/products/${product._id}#comments`);
     };
+    
+    // মোবাইলে কার্ডে একবার ট্যাপ করলে আইকন দেখানোর জন্য নতুন ফাংশন
+    const handleCardClick = (e) => {
+        if ('ontouchstart' in window) {
+            if (!isMobileTapped) {
+                e.preventDefault();
+                setIsMobileTapped(true);
+            }
+        }
+    };
+    
+    const handleMouseLeave = () => {
+        if (isMobileTapped) {
+            setIsMobileTapped(false);
+        }
+    };
 
     return (
         <Link 
             href={`/products/${product._id}`}
+            onClick={handleCardClick}
+            onMouseLeave={handleMouseLeave}
             className="group relative block bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2"
         >
             <div className="relative w-full overflow-hidden aspect-[4/3]">
@@ -78,7 +96,7 @@ export default function ShopProductCard({ product }) {
                 />
             </div>
             
-            <div className="absolute inset-0 flex flex-col items-end justify-start gap-3 p-4 pt-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+            <div className={`absolute inset-0 flex flex-col items-end justify-start gap-3 p-4 pt-8 transition-opacity duration-300 pointer-events-none ${isMobileTapped ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
                 <button 
                     onClick={(e) => handleActionClick(e, handleLike)} 
                     disabled={isLiking} 

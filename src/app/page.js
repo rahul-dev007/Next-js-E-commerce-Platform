@@ -1,5 +1,3 @@
-// src/app/page.js (সম্পূর্ণ এবং ফিক্সড সংস্করণ)
-
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -21,7 +19,7 @@ import FeatureSlider from "../components/FeatureSlider";
 
 // FeaturedProducts কম্পোনেন্ট
 function FeaturedProducts() {
-    const { data, isLoading, error } = useGetProductsQuery({ page: 1, limit: 10 }); // limit দিয়ে ১০টি প্রোডাক্ট আনা হচ্ছে
+    const { data, isLoading, error } = useGetProductsQuery({ page: 1, limit: 10 });
     
     const products = data?.products || [];
     
@@ -51,8 +49,7 @@ function FeaturedProducts() {
 
     return (
         <div className="w-full overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)]">
-            {/* ★★★ এখানে .animate-marquee ক্লাসটি ব্যবহার করা হয়েছে ★★★ */}
-            <div className="flex animate-marquee py-4">
+            <div className="flex animate-marquee hover:[animation-play-state:paused] py-4">
                 {marqueeProducts.map((product, index) => (
                     <div 
                         key={`${product._id}-${index}`} 
@@ -72,14 +69,12 @@ export default function HomePage() {
     const [heroVariant, setHeroVariant] = useState(null);
 
     useEffect(() => {
-        // শুধুমাত্র ক্লায়েন্ট-সাইডে রান হবে
         const variant = Math.random() < 0.5 ? 'video' : 'image';
         setHeroVariant(variant);
     }, []);
 
     const renderHeroSection = () => {
         if (!heroVariant) {
-            // Hero সেকশনের জন্য একটি সুন্দর স্কেলেটন লোডার
             return <div className="h-screen w-full bg-gray-900 animate-pulse"></div>;
         }
         return heroVariant === 'video' ? <HeroVideo /> : <HeroImage />;
