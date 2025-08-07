@@ -1,5 +1,3 @@
-// src/app/products/page.js (Final and Correct Version)
-
 "use client";
 
 import { useState, Suspense } from "react";
@@ -10,7 +8,6 @@ import { useSession } from "next-auth/react";
 import { Search, PlusCircle, Inbox, Loader2 } from "lucide-react";
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
-// ★★★ THIS IS THE REAL FIX: We are now importing the CORRECT card component ★★★
 import ShopProductCard from '../../components/ShopProductCard';
 
 // Product Card Skeleton Component (Unchanged)
@@ -30,18 +27,34 @@ function ProductCardSkeleton() {
     );
 }
 
-// Pagination Component (Unchanged)
+// Pagination Component (Updated with Responsive Classes)
 function Pagination({ currentPage, totalPages, onPageChange }) {
     if (totalPages <= 1) return null;
-    // Assuming you have your button classes here
+    
     return (
-        <div className="mt-12 flex items-center justify-center space-x-4">
-            <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-gray-400">Previous</button>
-            <span className="text-gray-700 dark:text-gray-300">Page {currentPage} of {totalPages}</span>
-            <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-gray-400">Next</button>
+        // ★★★ আসল সমাধান এখানে: রেসপন্সিভ স্পেসিং এবং প্যাডিং ★★★
+        <div className="mt-12 flex items-center justify-center space-x-2 sm:space-x-4">
+            <button
+                onClick={() => onPageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="rounded-lg bg-indigo-600 px-3 sm:px-4 py-2 text-sm font-semibold text-white shadow-md transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-gray-400 dark:disabled:bg-gray-600"
+            >
+                Previous
+            </button>
+            <span className="text-sm text-gray-700 dark:text-gray-300">
+                Page {currentPage} of {totalPages}
+            </span>
+            <button
+                onClick={() => onPageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="rounded-lg bg-indigo-600 px-3 sm:px-4 py-2 text-sm font-semibold text-white shadow-md transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-gray-400 dark:disabled:bg-gray-600"
+            >
+                Next
+            </button>
         </div>
     );
 }
+
 
 // Product List Component (Unchanged)
 function ProductList() {
@@ -86,7 +99,6 @@ function ProductList() {
             return (
                 <div>
                     <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                        {/* We are now correctly using ShopProductCard here */}
                         {products.map((product) => <ShopProductCard key={product._id} product={product} />)}
                     </div>
                     {pagination && <Pagination currentPage={pagination.currentPage} totalPages={pagination.totalPages} onPageChange={handlePageChange} />}
