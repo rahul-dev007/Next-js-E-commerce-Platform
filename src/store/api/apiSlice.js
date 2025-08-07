@@ -1,5 +1,3 @@
-// src/store/api/apiSlice.js (চূড়ান্ত প্রোডাকশন-রেডি সংস্করণ)
-
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const apiSlice = createApi({
@@ -8,51 +6,73 @@ export const apiSlice = createApi({
   tagTypes: ['Product', 'User', 'Notification', 'Stats'],
 
   endpoints: (builder) => ({
-
-    // ... তোমার অন্যান্য এন্ডপয়েন্ট (getProducts, getUsers, ইত্যাদি) অপরিবর্তিত থাকবে ...
+    
+    // ===== প্রোডাক্ট এন্ডপয়েন্ট =====
     getProducts: builder.query({
-      query: ({ page = 1, search = '', scope = '' }) => `products?page=${page}&search=${search}&scope=${scope}`,
-      transformResponse: (response) => response.data || { products: [], pagination: {} },
-      providesTags: (result) => result?.products ? [...result.products.map(({ _id }) => ({ type: 'Product', id: _id })), { type: 'Product', id: 'LIST' }] : [{ type: 'Product', id: 'LIST' }],
+        query: ({ page = 1, search = '', scope = '' }) => `products?page=${page}&search=${search}&scope=${scope}`,
+        transformResponse: (response) => response.data || { products: [], pagination: {} },
+        providesTags: (result) => result?.products ? [...result.products.map(({ _id }) => ({ type: 'Product', id: _id })), { type: 'Product', id: 'LIST' }] : [{ type: 'Product', id: 'LIST' }],
     }),
     getProductById: builder.query({
-      query: (id) => `products/${id}`,
-      transformResponse: (response) => response.data,
-      providesTags: (result, error, id) => [{ type: 'Product', id }],
+        query: (id) => `products/${id}`,
+        transformResponse: (response) => response.data,
+        providesTags: (result, error, id) => [{ type: 'Product', id }],
     }),
     addProduct: builder.mutation({
-      query: (newProduct) => ({ url: '/products', method: 'POST', body: newProduct }),
-      invalidatesTags: [{ type: 'Product', id: 'LIST' }],
+        query: (newProduct) => ({ url: '/products', method: 'POST', body: newProduct }),
+        invalidatesTags: [{ type: 'Product', id: 'LIST' }],
     }),
     updateProduct: builder.mutation({
-      query: ({ id, ...patch }) => ({ url: `products/${id}`, method: 'PATCH', body: patch }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'Product', id }, { type: 'Product', id: 'LIST' }],
+        query: ({ id, ...patch }) => ({ url: `products/${id}`, method: 'PATCH', body: patch }),
+        invalidatesTags: (result, error, { id }) => [{ type: 'Product', id }, { type: 'Product', id: 'LIST' }],
     }),
     deleteProduct: builder.mutation({
-      query: (id) => ({ url: `products/${id}`, method: 'DELETE' }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'Product', id: 'LIST' }],
+        query: (id) => ({ url: `products/${id}`, method: 'DELETE' }),
+        invalidatesTags: (result, error, { id }) => [{ type: 'Product', id: 'LIST' }],
+    }),
+    likeProduct: builder.mutation({
+      query: (productId) => ({ url: `products/${productId}/like`, method: 'POST' }),
+      invalidatesTags: (result, error, productId) => [{ type: 'Product', id: 'LIST' }, { type: 'Product', id: productId }],
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try { await queryFulfilled; dispatch(apiSlice.util.invalidateTags(['Notification'])); } catch (err) {}
+      },
+    }),
+    addComment: builder.mutation({
+      query: ({ productId, text }) => ({ url: `products/${productId}/comment`, method: 'POST', body: { text } }),
+      invalidatesTags: (result, error, { productId }) => [{ type: 'Product', id: productId }],
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try { await queryFulfilled; dispatch(apiSlice.util.invalidateTags(['Notification'])); } catch (err) {}
+      },
+    }),
+    // ==========================================================
+    // ===== ★★★ রিভিউ মিউটেশন এখানে যোগ করা হয়েছে ★★★ =====
+    // ==========================================================
+    addProductReview: builder.mutation({
+        query: ({ productId, review }) => ({
+            url: `/products/${productId}/review`,
+            method: 'POST',
+            body: review,
+        }),
+        // যখন একটি নতুন রিভিউ যোগ করা হবে, তখন সেই συγκεκριμένη প্রোডাক্টের ডেটা রিফ্রেশ হবে
+        invalidatesTags: (result, error, { productId }) => [{ type: 'Product', id: productId }],
     }),
 
+    // ===== ইউজার এন্ডপয়েন্ট =====
     getUsers: builder.query({
       query: () => 'admin/users',
-      // ★★★ এই অংশটি যোগ করলে ভালো হয় ★★★
-      transformResponse: (response) => response.data || [], // নিশ্চিত করে যে data প্রপার্টি রিটার্ন হবে, না থাকলে খালি অ্যারে
-      providesTags: (result) =>
-        result ?
-          [...result.map(({ _id }) => ({ type: 'User', id: _id })), { type: 'User', id: 'LIST' }]
-          : [{ type: 'User', id: 'LIST' }],
+      transformResponse: (response) => response.data || [],
+      providesTags: (result) => result ? [...result.map(({ _id }) => ({ type: 'User', id: _id })), { type: 'User', id: 'LIST' }] : [{ type: 'User', id: 'LIST' }],
     }),
-
     updateUserRole: builder.mutation({
       query: ({ id, role }) => ({ url: `admin/users/${id}`, method: 'PUT', body: { role } }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'User', id }, { type: 'User', id: 'LIST' }], // এভাবে করলে আরো নিখুঁতভাবে ইনভ্যালিডেট হয়
+      invalidatesTags: (result, error, { id }) => [{ type: 'User', id }, { type: 'User', id: 'LIST' }],
     }),
-
     deleteUser: builder.mutation({
       query: (id) => ({ url: `admin/users/${id}`, method: 'DELETE' }),
       invalidatesTags: [{ type: 'User', id: 'LIST' }],
     }),
 
+    // ===== অন্যান্য এন্ডপয়েন্ট =====
     getAdminStats: builder.query({
       query: () => 'admin/stats',
       providesTags: ['Stats', 'Product', 'User']
@@ -65,44 +85,11 @@ export const apiSlice = createApi({
       query: () => ({ url: 'notifications', method: 'POST' }),
       invalidatesTags: ['Notification'],
     }),
-
-    // ==========================================================
-    // ===== ★★★ আসল সমাধানটি এখানে (The Real Fix) ★★★ =====
-    // ==========================================================
-
-    likeProduct: builder.mutation({
-      query: (productId) => ({ url: `products/${productId}/like`, method: 'POST' }),
-      // প্রথমে প্রোডাক্ট ট্যাগ ইনভ্যালিডেট করা হচ্ছে
-      invalidatesTags: (result, error, productId) => [{ type: 'Product', id: 'LIST' }, { type: 'Product', id: productId }],
-      // সফল হওয়ার পর নোটিফিকেশন ডেটা রিফ্রেশ করার জন্য
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-        try {
-          await queryFulfilled;
-          // অন্য API স্লাইসের ট্যাগকে ইনভ্যালিডেট করার জন্য dispatch করতে হয়
-          dispatch(apiSlice.util.invalidateTags(['Notification']));
-        } catch (err) {
-          console.error('Failed to invalidate notifications after like:', err);
-        }
-      },
-    }),
-
-    addComment: builder.mutation({
-      query: ({ productId, text }) => ({ url: `products/${productId}/comment`, method: 'POST', body: { text } }),
-      invalidatesTags: (result, error, { productId }) => [{ type: 'Product', id: productId }],
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-        try {
-          await queryFulfilled;
-          dispatch(apiSlice.util.invalidateTags(['Notification']));
-        } catch (err) {
-          console.error('Failed to invalidate notifications after comment:', err);
-        }
-      },
-    }),
   }),
 });
 
 export const {
-  // ... তোমার পুরনো হুকগুলো ...
+  // পুরনো হুকগুলো
   useGetProductsQuery,
   useGetProductByIdQuery,
   useAddProductMutation,
@@ -114,7 +101,8 @@ export const {
   useGetAdminStatsQuery,
   useGetNotificationsQuery,
   useMarkNotificationsAsReadMutation,
-  // নতুন হুকগুলো
   useLikeProductMutation,
   useAddCommentMutation,
+  // ★★★ নতুন হুক এখানে যোগ করা হয়েছে ★★★
+  useAddProductReviewMutation,
 } = apiSlice;
