@@ -44,16 +44,8 @@ export const apiSlice = createApi({
         try { await queryFulfilled; dispatch(apiSlice.util.invalidateTags(['Notification'])); } catch (err) {}
       },
     }),
-    // ==========================================================
-    // ===== ★★★ রিভিউ মিউটেশন এখানে যোগ করা হয়েছে ★★★ =====
-    // ==========================================================
     addProductReview: builder.mutation({
-        query: ({ productId, review }) => ({
-            url: `/products/${productId}/review`,
-            method: 'POST',
-            body: review,
-        }),
-        // যখন একটি নতুন রিভিউ যোগ করা হবে, তখন সেই συγκεκριμένη প্রোডাক্টের ডেটা রিফ্রেশ হবে
+        query: ({ productId, review }) => ({ url: `/products/${productId}/review`, method: 'POST', body: review }),
         invalidatesTags: (result, error, { productId }) => [{ type: 'Product', id: productId }],
     }),
 
@@ -85,11 +77,26 @@ export const apiSlice = createApi({
       query: () => ({ url: 'notifications', method: 'POST' }),
       invalidatesTags: ['Notification'],
     }),
+
+    // ===== ★★★ পাসওয়ার্ড রিসেট এন্ডপয়েন্ট ★★★ =====
+    forgotPassword: builder.mutation({
+        query: ({ email }) => ({
+            url: '/auth/forgot-password',
+            method: 'POST',
+            body: { email },
+        }),
+    }),
+    resetPassword: builder.mutation({
+        query: ({ token, password }) => ({
+            url: `/auth/reset-password/${token}`,
+            method: 'PUT',
+            body: { password },
+        }),
+    }),
   }),
 });
 
 export const {
-  // পুরনো হুকগুলো
   useGetProductsQuery,
   useGetProductByIdQuery,
   useAddProductMutation,
@@ -103,6 +110,8 @@ export const {
   useMarkNotificationsAsReadMutation,
   useLikeProductMutation,
   useAddCommentMutation,
-  // ★★★ নতুন হুক এখানে যোগ করা হয়েছে ★★★
   useAddProductReviewMutation,
+  // ★★★ নতুন হুক এখানে যোগ করা হয়েছে ★★★
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
 } = apiSlice;

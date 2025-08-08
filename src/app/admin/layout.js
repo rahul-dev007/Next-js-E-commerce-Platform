@@ -6,9 +6,9 @@ import { useEffect, useState, Fragment } from "react";
 import Link from 'next/link';
 import Image from "next/image";
 import { Menu as HeadlessMenu, Transition } from '@headlessui/react';
-import { Loader2, LayoutDashboard, Users, ShoppingBag, Settings, ExternalLink, Menu, X, ChevronDown, User, LogOut } from 'lucide-react';
+import { Loader2, LayoutDashboard, Users, ShoppingBag, ExternalLink, Menu, X, ChevronDown, User, LogOut } from 'lucide-react';
 import { useDispatch } from 'react-redux';
-// ★★★ আসল সমাধান: Path alias ছাড়া রিলেটিভ পাথ ব্যবহার করা হয়েছে ★★★
+// ★★★ রিলেটিভ পাথ ব্যবহার করা হয়েছে ★★★
 import { cartActions } from '../../store/cartSlice'; 
 
 // ===================================
@@ -23,6 +23,13 @@ function AdminSidebar({ isOpen, setIsOpen }) {
         { href: '/admin/users', icon: Users, label: 'Users', roles: ['superadmin'] },
         { href: '/admin/products', icon: ShoppingBag, label: 'Products', roles: ['admin', 'superadmin'] },
     ];
+
+    const handleViewSiteClick = (e) => {
+        e.preventDefault();
+        window.open(e.currentTarget.href, '_blank');
+        setIsOpen(false);
+    };
+
     return (
         <>
             <div onClick={() => setIsOpen(false)} className={`fixed inset-0 bg-black/60 z-30 lg:hidden transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}></div>
@@ -45,11 +52,18 @@ function AdminSidebar({ isOpen, setIsOpen }) {
                         ))}
                     </nav>
                 </div>
+                
                 <div className="p-4 border-t border-gray-700">
-                    <Link href="/" target="_blank" rel="noopener noreferrer" className="flex items-center py-2.5 px-4 mx-2 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition-colors">
+                    <a 
+                        href="/" 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        onClick={handleViewSiteClick}
+                        className="flex items-center py-2.5 px-4 mx-2 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition-colors cursor-pointer"
+                    >
                         <ExternalLink className="h-5 w-5 mr-3" />
                         <span>View Live Site</span>
-                    </Link>
+                    </a>
                 </div>
             </aside>
         </>
@@ -71,18 +85,18 @@ function AdminTopbar({ onMenuClick }) {
     };
 
     return (
-        <header className="sticky top-0 z-20 bg-white dark:bg-gray-800 shadow-sm p-4 flex justify-between items-center border-b dark:border-gray-700">
+        <header className="sticky top-0 z-20 bg-white dark:bg-gray-800 shadow-sm p-2 sm:p-4 flex justify-between items-center border-b dark:border-gray-700">
             <button onClick={onMenuClick} className="lg:hidden text-gray-600 dark:text-gray-300 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
                 <Menu size={24} />
             </button>
             
             <div className="flex-1"></div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
                 {session?.user && (
                     <HeadlessMenu as="div" className="relative">
                         <HeadlessMenu.Button className="flex items-center gap-2 text-sm rounded-full p-1 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                            <div className="relative h-8 w-8 rounded-full overflow-hidden">
+                            <div className="relative h-8 w-8 rounded-full overflow-hidden flex-shrink-0">
                                 <Image 
                                     src={session.user.image || '/avatar-placeholder.png'} 
                                     alt={session.user.name || 'User'} 
@@ -90,8 +104,10 @@ function AdminTopbar({ onMenuClick }) {
                                     className="object-cover" 
                                 />
                             </div>
-                            <span className="hidden sm:inline font-medium text-gray-700 dark:text-gray-200">{session.user.name}</span>
-                            <ChevronDown className="h-4 w-4 text-gray-500" />
+                            <div className="hidden sm:flex items-center gap-1">
+                                <span className="font-medium text-gray-700 dark:text-gray-200 max-w-[100px] truncate">{session.user.name}</span>
+                                <ChevronDown className="h-4 w-4 text-gray-500" />
+                            </div>
                         </HeadlessMenu.Button>
                         <Transition as={Fragment} enter="transition ease-out duration-100" enterFrom="transform opacity-0 scale-95" enterTo="transform opacity-100 scale-100" leave="transition ease-in duration-75" leaveFrom="transform opacity-100 scale-100" leaveTo="transform opacity-0 scale-95">
                             <HeadlessMenu.Items className="absolute right-0 mt-2 w-56 origin-top-right bg-white dark:bg-gray-700 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">

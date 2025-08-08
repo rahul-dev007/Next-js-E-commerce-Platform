@@ -1,4 +1,4 @@
-// src/components/HeroImage.jsx (সম্পূর্ণ নতুন এবং ইউনিক ডিজাইন)
+// src/components/HeroImage.jsx (Final Corrected Version)
 
 "use client";
 
@@ -15,7 +15,6 @@ export default function HeroImage() {
         offset: ["start start", "end start"],
     });
 
-    // প্যারালাক্স ইফেক্টের জন্য y-অক্ষের ট্রান্সফরমেশন
     const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
 
     const contentVariants = {
@@ -40,12 +39,13 @@ export default function HeroImage() {
             {/* Background Image with Parallax */}
             <motion.div className="absolute inset-0 z-[-1]" style={{ y }}>
                 <Image
-                
-                     src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=1280&q=70&auto=format&fit=crop"
+                    src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=1280&q=70&auto=format&fit=crop"
                     alt="Fashion background"
                     fill
                     priority
                     className="object-cover"
+                    // ★★★ THIS IS THE REAL FIX: Turn off Next.js optimization for this image ★★★
+                    unoptimized={true} 
                 />
             </motion.div>
 

@@ -20,12 +20,18 @@ const userSchema = new Schema(
       type: String,
       default: '', 
     },
-    // role ফিল্ডটি আমাদের নতুন সিস্টেম অনুযায়ী আপডেট করা হয়েছে
     role: {
       type: String,
-      enum: ['superadmin', 'admin', 'user'], // এখন তিনটি সম্ভাব্য Role আছে
-      default: 'user', // নতুন ব্যবহারকারীরা ডিফল্টভাবে 'user' হবে
+      enum: ['superadmin', 'admin', 'user'],
+      default: 'user',
     },
+
+    // ==========================================================
+    // ===== ★★★ পাসওয়ার্ড রিসেটের জন্য নতুন ফিল্ড (এখানে যোগ করা হয়েছে) ★★★ =====
+    // ==========================================================
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
+
   },
   { timestamps: true }
 );

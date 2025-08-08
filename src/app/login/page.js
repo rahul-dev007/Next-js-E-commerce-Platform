@@ -1,5 +1,3 @@
-// src/app/login/page.js
-
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -17,7 +15,7 @@ const loginSchema = z.object({
   password: z.string().min(1, { message: "Password is required." }),
 });
 
-// ★★★ মূল লগইন ফর্মটি একটি আলাদা কম্পোনেন্টে সরানো হয়েছে ★★★
+// মূল লগইন ফর্ম
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -85,7 +83,6 @@ function LoginForm() {
     return <Loader2 className="h-16 w-16 animate-spin text-indigo-500" />;
   }
 
-  // ★★★ আপনার UI কোডটি এখানে அப்படியே আছে, কোনো পরিবর্তন ছাড়াই ★★★
   return (
       <div className="w-full max-w-md space-y-6 rounded-2xl bg-white p-8 shadow-2xl dark:bg-gray-800">
         <div className="text-center">
@@ -132,7 +129,14 @@ function LoginForm() {
             </button>
             {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password.message}</p>}
           </div>
-          <div className="text-right text-sm"><a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">Forgot password?</a></div>
+          
+          {/* ★★★ আসল সমাধান: <a> ট্যাগের পরিবর্তে <Link> কম্পোনেন্ট ব্যবহার করা হয়েছে ★★★ */}
+          <div className="text-right text-sm">
+            <Link href="/forgot-password" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
+              Forgot password?
+            </Link>
+          </div>
+
           {error && <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400">{error}</div>}
           <div>
             <button type="submit" disabled={isLoading} className="flex w-full justify-center rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 py-3 px-4 font-semibold text-white shadow-lg transition-all duration-300 hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-70 dark:focus:ring-offset-gray-800">
@@ -145,7 +149,7 @@ function LoginForm() {
   );
 }
 
-// ★★★ মূল পেজ কম্পোনেন্ট এখন একটি Wrapper ★★★
+// মূল পেজ কম্পোনেন্ট
 export default function LoginPage() {
     return (
         <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
