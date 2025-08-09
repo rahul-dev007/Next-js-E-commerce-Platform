@@ -5,10 +5,12 @@ import bcrypt from 'bcryptjs';
 import dbConnect from '../../../../../lib/db';
 import User from '../../../../../models/User';
 
+export const runtime = 'nodejs';
+
 export async function PUT(request, { params }) {
     try {
         await dbConnect();
-        const { token } = params;
+        const { token } = await params;
         const { password } = await request.json();
         
         const resetPasswordToken = crypto
